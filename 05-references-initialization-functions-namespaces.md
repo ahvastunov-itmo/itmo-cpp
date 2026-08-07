@@ -413,23 +413,15 @@ int main() {
 
 ```cpp
 int main() {
-```
-
-- int i();   // function
-```cpp
-int k = 2;  // copy initialization
-```
-
-- int j(2);  // direct initialization
-- int l{};   //value initialization
-```cpp
-std::string str{'a', 'b', 'c'};  // list initialization
-```
-
-- SCircle c {{1,2}, 3};  // aggregate initialization
-```cpp
+    int k = 2;                         // copy initialization
+    int j(2);                          // direct initialization
+    int l{};                           // value initialization
+    std::string str{'a', 'b', 'c'};    // list initialization
+    SCircle circle{ {1, 2}, 3 };       // aggregate initialization
 }
 ```
+
+Запись `int i();` объявляет функцию, а не переменную.
 
 ## namespace
 
@@ -618,4 +610,3 @@ int main() {
     std::cout << A::counter << std::endl;
 }
 ```
-
