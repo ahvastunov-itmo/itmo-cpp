@@ -1,6 +1,14 @@
-# Lecture 9. ООП. Наследование и полиморфизм
+---
+title: "Лекция 9. Наследование и полиморфизм"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/09-oop-inheritance-polymorphism.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1biio_zFvspHq_OjWmjsrvfrRXsj3seYrmsTfUlBW0Yo/edit)
+
+:::
 
 ## Язык С++
 
@@ -601,4 +609,3 @@ class Derrived : public Base {
 - Инкапсуляция
 - Наследование
 - Полиформизм
-

@@ -1,6 +1,14 @@
-# Lecture 13. STL. Контейнеры, итераторы, алгоритмы
+---
+title: "Лекция 13. STL: контейнеры, итераторы и алгоритмы"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/13-stl-containers-iterators-algorithms.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1KYU1Z0Qcz1FqWUk_IL7FAw_84i5SBQKmq1BIi5d3gqM/edit)
+
+:::
 
 ## Язык С++
 
@@ -531,4 +539,3 @@ int main() {
         std::inner_product(&x1[0], &x1[5], &x2[0], 1, std::multiplies<int>(), std::plus<int>());
 }
 ```
-

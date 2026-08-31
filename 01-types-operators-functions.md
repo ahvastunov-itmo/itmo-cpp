@@ -1,6 +1,14 @@
-# Lecture 1. Types & operators & function
+---
+title: "Лекция 1. Типы, операторы и функции"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/01-types-operators-functions.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/13bW8SWoGPWDIA0dT_gbFFKHjeHFEfSQusTbYF7MpfCg/edit)
+
+:::
 
 ## Язык С++
 
@@ -268,8 +276,6 @@ printf("sizeof(x) = %zu\n", sizeof(x));
 ```
 
 ## a[k] | индексы | 16 | слева направо
-
-![Слайд 24: a[k\] | индексы | 16 | слева направо](assets/01-types-operators-functions/slide-24.png)
 
 - f(…) | вызов функции | 16 | слева направо
 - . | прямой выбор | 16 | слева направо
@@ -774,4 +780,3 @@ int main() {
     return 0;
 }
 ```
-

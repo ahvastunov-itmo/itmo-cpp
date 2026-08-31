@@ -1,6 +1,14 @@
-# Lecture 14. STL. Контейнеры, итераторы, алгоритмы - II
+---
+title: "Лекция 14. STL: контейнеры, итераторы и алгоритмы — II"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/14-stl-containers-iterators-algorithms-ii.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1PlFddq5lwJJ6dHyLOoUyIHCbBPBm77ye1VSvizatT7o/edit)
+
+:::
 
 ## Язык С++
 
@@ -516,4 +524,3 @@ typename std::iterator_traits<It>::difference_type do_distance(It first, It last
 }
 }  // namespace detail
 ```
-

@@ -1,6 +1,14 @@
-# Lecture 19.  Variadic Templates
+---
+title: "Лекция 19. Вариативные шаблоны"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/19-variadic-templates.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1HXBBKpFkJ6zpzToUNHf9nhwnDq5MwL0Uwd-6VlJO-f4/edit)
+
+:::
 
 ## Язык С++
 
@@ -359,4 +367,3 @@ class Foo : public Futures<Foo<Futures...>>... {
 
 using FooAB = Foo<FutureA, FutureB, FutureC>;
 ```
-

@@ -1,6 +1,14 @@
-# Lecture 10  ООП. Полиморфизм.
+---
+title: "Лекция 10. Полиморфизм"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/10-oop-polymorphism.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1odZGZdK0veFKQc_q1g36AeSxNxTLJsLeO34_si9WrkU/edit)
+
+:::
 
 ## Язык С++
 
@@ -279,4 +287,3 @@ class Derrived : public Base {
 - Инкапсуляция
 - Наследование
 - Полиформизм
-

@@ -1,6 +1,14 @@
-# Lecture 7. C++. ООП. Абстракция. Инкапсуляция
+---
+title: "Лекция 7. Абстракция и инкапсуляция"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/07-oop-abstraction-encapsulation.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1evl7GwIw51ynhoAWkI9c-OAtRlEOiZvtLAkwCdzvpEM/edit)
+
+:::
 
 ## Язык С++
 
@@ -714,5 +722,3 @@ int main() {
 ```
 
 ## class\struct
-
-

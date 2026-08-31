@@ -1,6 +1,14 @@
-# Lecture 18.  Value categories & Move semantics
+---
+title: "Лекция 18. Категории значений и семантика перемещения"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/18-value-categories-move-semantics.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1e5ypC_v9q1hhPUMKDSabFFJB1arI4-yWHbs1hJTcJqo/edit)
+
+:::
 
 ## Язык С++
 
@@ -512,4 +520,3 @@ Foo createFoo(int i) {
     return i % 2 == 0 ? odd : even;
 }
 ```
-

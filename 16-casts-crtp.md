@@ -1,6 +1,14 @@
-# Lecture 16.  Casts, CRTP
+---
+title: "Лекция 16. Приведения типов и CRTP"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/16-casts-crtp.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1KN15XJnUKzBzvdEdD-LUIhlnrkIv7lcyUltGX6VFIMY/edit)
+
+:::
 
 ## Язык С++
 
@@ -416,4 +424,3 @@ class Cat : public Animal<Cat> {
 - to_string
 - bit_cast
 - to_chars
-

@@ -1,6 +1,14 @@
-# Копия Lecture 13.  Smart pointers
+---
+title: "Умные указатели"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/smart-pointers.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1CAhC_sj_HBR5taAUitA-6_-Yi9MODDhrQioBoT8Gz_I/edit)
+
+:::
 
 ## Язык С++
 
@@ -407,4 +415,3 @@ void func() {
 - CRTP
 - Позволяет создать shared_ptr внутри методов объектов в shared_ptr
 - Кидает bad_weak_ptr если объект не shared_ptr
-

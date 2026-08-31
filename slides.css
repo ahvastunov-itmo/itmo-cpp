@@ -1,0 +1,41 @@
+:root {
+  --course-accent: #0b7285;
+  --course-warm: #f59f00;
+}
+
+.reveal {
+  font-size: 30px;
+}
+
+.reveal h1,
+.reveal h2 {
+  color: var(--course-accent);
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+.reveal h2 {
+  border-bottom: 0.12em solid var(--course-warm);
+  padding-bottom: 0.2em;
+}
+
+.reveal pre {
+  width: 100%;
+  margin-inline: 0;
+}
+
+.reveal pre code {
+  max-height: 28rem;
+  font-size: 0.72em;
+  line-height: 1.25;
+}
+
+.reveal img {
+  max-height: 30rem;
+  object-fit: contain;
+}
+
+.reveal blockquote {
+  border-left: 0.25em solid var(--course-warm);
+  padding: 0.6em 0.9em;
+}

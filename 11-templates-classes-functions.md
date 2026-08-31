@@ -1,6 +1,14 @@
-# Lecture 11. Template. class and function - I
+---
+title: "Лекция 11. Шаблоны классов и функций — I"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/11-templates-classes-functions.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1HD87XioCGgkiUfKJY1prQpsXkkLcIbNc-QkQoFmG0zA/edit)
+
+:::
 
 ## Язык С++
 
@@ -276,7 +284,7 @@ class CArray {
    public:
 ```
 
-- T& operator[](size_t index) { return arr[index]; }
+- `T& operator[](size_t index) { return arr[index]; }`
 ```cpp
 const T& operator[](size_t index) const {
     return arr[index];
@@ -378,4 +386,3 @@ struct fibonacci<1> {
     enum { value = 1 };
 };
 ```
-

@@ -1,6 +1,14 @@
-# Lecture 17. Lambda
+---
+title: "Лекция 17. Лямбда-выражения"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/17-lambda.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/17EpE__hciP3z2k_GDZLE2Nfpu3nSUrxmv5miqdNW_7Y/edit)
+
+:::
 
 ## Язык С++
 
@@ -283,7 +291,7 @@ int main() {
 ```
 
 - v.begin(), v.end(),
-- [](int value) { return value > 4;}
+- `[](int value) { return value > 4; }`
 ```cpp
    );
 
@@ -955,4 +963,3 @@ int main() {
 
 
 - // simple implementation
-

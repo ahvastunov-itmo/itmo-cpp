@@ -1,0 +1,107 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - "*.md"
+    - "!template.md"
+  resources:
+    - assets/
+
+lang: ru
+
+website:
+  title: "Основы программирования на C++"
+  description: "Конспекты курса по языкам C и C++"
+  site-url: "https://ahvastunov-itmo.github.io/itmo-cpp/"
+  repo-url: "https://github.com/ahvastunov-itmo/itmo-cpp"
+  repo-actions: [edit, source, issue]
+  page-navigation: true
+  reader-mode: true
+  open-graph: true
+  sidebar:
+    style: docked
+    search: true
+    collapse-level: 1
+    tools:
+      - icon: github
+        href: "https://github.com/ahvastunov-itmo/itmo-cpp"
+        text: GitHub
+    contents:
+      - href: index.md
+        text: Главная
+      - section: "Начало курса"
+        contents:
+          - href: 00-introduction.md
+            text: "Вводная лекция"
+          - href: 01-types-operators-functions.md
+            text: "1. Типы, операторы и функции"
+          - href: 02-pointers-arrays.md
+            text: "2. Указатели, массивы и строки"
+          - href: 03-struct-union.md
+            text: "3. Структуры и объединения"
+          - href: 04-memory.md
+            text: "4. Работа с памятью"
+          - href: 05-references-initialization-functions-namespaces.md
+            text: "5. Ссылки, функции и пространства имён"
+          - href: 06-compiler-preprocessor.md
+            text: "6. Компилятор и препроцессор"
+      - section: "Объектно-ориентированное программирование"
+        contents:
+          - href: 07-oop-abstraction-encapsulation.md
+            text: "7. Абстракция и инкапсуляция"
+          - href: 08-operator-overloading.md
+            text: "8. Перегрузка операторов"
+          - href: 09-oop-inheritance-polymorphism.md
+            text: "9. Наследование и полиморфизм"
+          - href: 10-oop-polymorphism.md
+            text: "10. Полиморфизм"
+      - section: "Шаблоны и стандартная библиотека"
+        contents:
+          - href: 11-templates-classes-functions.md
+            text: "11. Шаблоны классов и функций"
+          - href: 12-templates-ii.md
+            text: "12. Шаблоны — II"
+          - href: smart-pointers.md
+            text: "Умные указатели"
+          - href: 13-stl-containers-iterators-algorithms.md
+            text: "13. STL: контейнеры и алгоритмы"
+          - href: 14-stl-containers-iterators-algorithms-ii.md
+            text: "14. STL: контейнеры и алгоритмы — II"
+      - section: "Продвинутые возможности C++"
+        contents:
+          - href: 15-error-handling.md
+            text: "15. Обработка ошибок"
+          - href: 16-casts-crtp.md
+            text: "16. Приведения типов и CRTP"
+          - href: 17-lambda.md
+            text: "17. Лямбда-выражения"
+          - href: 18-value-categories-move-semantics.md
+            text: "18. Категории значений и move-семантика"
+          - href: 19-variadic-templates.md
+            text: "19. Вариативные шаблоны"
+          - href: 20-template-metaprogramming.md
+            text: "20. Шаблонное метапрограммирование"
+          - href: 21-concurrency.md
+            text: "21. Многопоточность"
+  page-footer:
+    left: "Материалы курса по C и C++"
+    right: "Сайт собран с помощью [Quarto](https://quarto.org/)"
+
+format:
+  html:
+    theme:
+      light: cosmo
+      dark: darkly
+    css: styles.css
+    toc: true
+    toc-title: "На этой странице"
+    toc-depth: 3
+    code-copy: true
+    code-overflow: wrap
+    anchor-sections: true
+    smooth-scroll: true
+    link-external-newwindow: true
+    grid:
+      sidebar-width: 310px
+      body-width: 900px
+      margin-width: 280px

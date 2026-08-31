@@ -1,6 +1,14 @@
-# Lecture 8. Operator overloading
+---
+title: "Лекция 8. Перегрузка операторов"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/08-operator-overloading.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/14JylCkORlmfPvXOP9rV8Qtup1Js-lVg6ijmNCRoNCPo/edit)
+
+:::
 
 ## Язык С++
 
@@ -60,7 +68,7 @@
 - a@b | (a).operator@ (b) | operator@ (a, b)
 - a=b | (a).operator= (b) |
 - a(b...) | (a).operator()(b...) |
-- a[b] | (a).operator[](b) |
+- `a[b] | (a).operator[](b) |`
 ```cpp
 a->| (a).operator->() |
 ```
@@ -225,7 +233,7 @@ class CIntArray {
 ```
 
 - // …
-- int& operator[](size_t idx) {
+- `int& operator[](size_t idx) {`
 ```cpp
 return data_[xidx];
 }
@@ -382,4 +390,3 @@ int main() {
     return 0;
 }
 ```
-

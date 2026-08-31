@@ -1,6 +1,14 @@
-# Lecture 12.  Template - II
+---
+title: "Лекция 12. Шаблоны — II"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/12-templates-ii.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/11NNpL3Cgr4mTCDua7TFczU-u5885MtQxIfbTPnKJKI0/edit)
+
+:::
 
 ## Язык С++
 
@@ -574,4 +582,3 @@ void func() {
 - CRTP
 - Позволяет создать shared_ptr внутри методов объектов в shared_ptr
 - Кидает bad_weak_ptr если объект не shared_ptr
-

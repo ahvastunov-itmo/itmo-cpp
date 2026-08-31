@@ -1,6 +1,14 @@
-# Вводная леция. Язык С и С++
+---
+title: "Вводная лекция. Язык C и C++"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/00-introduction.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1WLzk2HVW0uizU_kh8jKm1w_9VTBFSVgClJAoIhOV2NQ/edit)
+
+:::
 
 ## Основы программирования.
 
@@ -17,7 +25,7 @@
 - 5 лабораторных работ
 - Live Coding
 - ДифЗачет в декабре\июне
-- Все лекции, лабы и вопросы для зачета в Git
+- Все лекции, лабы и **вопросы** для зачета в Git
 
 ## Telegram ITMO C++ 25\26
 
@@ -211,4 +219,3 @@ int main(int argc, char** argv) {
 
 - ITMO C++ 25\26
 - ITMO C++ 25\26 News
-

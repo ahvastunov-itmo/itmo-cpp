@@ -1,6 +1,14 @@
-# Lecture 6. Compiler and preprocessor
+---
+title: "Лекция 6. Компилятор и препроцессор"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/06-compiler-preprocessor.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1XQGxRjDvRg-kp6ULItdyAmgV3s5LFyvX9n9sVwZcv6g/edit)
+
+:::
 
 ## Язык С++
 
@@ -525,4 +533,3 @@ int main(int, char**) {
 
 - Ошибки компиляции
 - Ошибки линковки
-

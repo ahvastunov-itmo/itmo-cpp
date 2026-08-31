@@ -1,6 +1,14 @@
-# Lecture 15. Error Handling
+---
+title: "Лекция 15. Обработка ошибок"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/15-error-handling.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1bXINre3KdxlpR7y4xLp6ecdY1Afrve-Xyje6W44NacY/edit)
+
+:::
 
 ## Язык С++
 
@@ -742,4 +750,3 @@ std::expected<uint32_t, std::invalid_argument> to_uint(std::string_view str) {
 
 Использует std::expected
 ```
-

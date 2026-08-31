@@ -1,6 +1,14 @@
-# Лекция 3. Структуры и объединения
+---
+title: "Лекция 3. Структуры и объединения"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/03-struct-union.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1T35d8A7BWSHqhICtrK9d_z1-EnlnLThijbci3W6qvro/edit)
+
+:::
 
 В этой лекции рассматриваются составные типы данных в C++. Структуры позволяют объединять связанные значения в один объект, а объединения — использовать одну область памяти для нескольких альтернативных представлений.
 

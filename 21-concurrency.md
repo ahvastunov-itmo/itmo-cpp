@@ -1,6 +1,14 @@
-# Lecture 21. Concurrency
+---
+title: "Лекция 21. Многопоточность"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/21-concurrency.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1Fc_-jBdbBDQFfX7lQNJSd-zDlk3r7P08mV5WQxWrDyE/edit)
+
+:::
 
 ## Язык С++
 
@@ -676,4 +684,3 @@ int main() {
     return 0;
 }
 ```
-

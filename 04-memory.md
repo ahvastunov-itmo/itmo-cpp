@@ -1,6 +1,14 @@
-# Lecture 4. Memory
+---
+title: "Лекция 4. Работа с памятью"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/04-memory.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1wlDOCjTv4JXUY1fGPwulFewW5nLbdcsywN7jFesN-Ts/edit)
+
+:::
 
 ## Язык С++
 
@@ -339,4 +347,3 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 ```
-

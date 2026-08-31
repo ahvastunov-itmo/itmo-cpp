@@ -1,6 +1,14 @@
-# Лекция 2. Указатели, массивы и строки
+---
+title: "Лекция 2. Указатели, массивы и строки"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/02-pointers-arrays.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1kZ238rxAW6KVKxkX4p2x0dyiPRsZRtL9_NEruCbfhcI/edit)
+
+:::
 
 В этой лекции рассматриваются адреса памяти и работа с ними в C++. Мы разберём, как устроены указатели, почему массивы тесно связаны с адресной арифметикой, как представлены C-строки и как передавать функции через указатели.
 

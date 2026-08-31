@@ -1,6 +1,14 @@
-# Lecture 20.  Template Metaprogramming
+---
+title: "Лекция 20. Шаблонное метапрограммирование"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/20-template-metaprogramming.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1pI7DRfTnDS_f5YLhoj6YMc7jwO4-C6jUcxNBxOMsZnE/edit)
+
+:::
 
 ## Язык С++
 
@@ -935,4 +943,3 @@ requires are_all_same<Args...>;
 }
 ;
 ```
-

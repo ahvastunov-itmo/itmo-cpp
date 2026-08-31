@@ -1,6 +1,14 @@
-# Lecture 5. Reference, initialization, function, namespace
+---
+title: "Лекция 5. Ссылки, инициализация, функции и пространства имён"
+---
+
+::: {.content-visible unless-format="revealjs"}
+
+[Открыть слайды](slides/05-references-initialization-functions-namespaces.html){.btn .btn-outline-primary target="_blank"}
 
 > Источник: [Google Slides](https://docs.google.com/presentation/d/1AHV9d9JTazh1foZaieTM14UYgQVUmFeVaGYe9lNGzbs/edit)
+
+:::
 
 ## Язык С++
 
