@@ -6,8 +6,6 @@ title: "Лекция 5. Ссылки, инициализация, функции
 
 [Открыть слайды](slides/05-references-initialization-functions-namespaces.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1AHV9d9JTazh1foZaieTM14UYgQVUmFeVaGYe9lNGzbs/edit)
-
 :::
 
 ## Язык С++
@@ -65,10 +63,10 @@ void swap(int* pi, int* pj) {
 
 
 - “Псевдоним” для уже существующего объекта
-- Обязательно инициализирована
+- Ссылка должна быть инициализирована при объявлении
 - Не занимает дополнительную память
 - Нельзя сделать указатель на ссылку
-- Продлевают “жизнь” временным переменным
+- `const`-ссылка может продлевать время жизни временного объекта
 
 ## Reference
 
@@ -77,41 +75,25 @@ void swap(int* pi, int* pj) {
 int main() {
     int i = 10;
     int& j = i;
-```
+    // int& k;  // error: ‘k’ declared as reference but not initialized
+    j = 20;
+    std::cout << i << std::endl;
+    std::cout << &i << "  " << &j << std::endl;
 
-- //int& k;  // error: ‘k’ declared as reference but not initialized
-```cpp
-j = 20;
-std::cout << i << std::endl;
-std::cout << &i << "  " << &j << std::endl;
-
-const int& r = i;
-```
-
-- // r = 21; // error assignment of read-only reference ‘r’
-```cpp
-return 0;
+    const int& r = i;
+    // r = 21; // error assignment of read-only reference ‘r’
+    return 0;
 }
 ```
 
 ## Reference
 
 
-```cpp
-void swap(int& i, int& j) {
-    int temp = i;
-    i = j;
-    j = temp;
-}
-
-int main() {
-    int x = 10;
-    int y = 20;
-    swap(x, y);
-
-    return 0;
-}
+```{.cpp filename="swap-references.cpp"}
+{{< include examples/05-references-initialization-functions-namespaces/swap-references.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-05-swap-references]{aria-label="Open in Compiler Explorer"}
 
 ## Rvalue reference
 
@@ -174,7 +156,7 @@ int main() {
 
 
 - By reference
-- В общем случае наиболее “дешевый” и простой способ
+- Для больших объектов обычно позволяет избежать копирования
 - By pointer
 - By value
 - Для встроенных и небольших типов
@@ -258,31 +240,19 @@ void print(float x) {
 }
 
 int main() {
-```
-
-- print(20.1);   // error: call to 'print' is ambiguous
-```cpp
-return 0;
+    print(20.1);  // error: call to 'print' is ambiguous
+    return 0;
 }
 ```
 
 ## Перегрузка функций
 
 
-```cpp
-int test(int i) {
-    return i;
-}
-
-float test(float f) {
-    return f;
-}
-
-int main() {
-    test(10.2f);
-    return 0;
-}
+```{.cpp filename="function-overload.cpp"}
+{{< include examples/05-references-initialization-functions-namespaces/function-overload.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-05-function-overload]{aria-label="Open in Compiler Explorer"}
 
 ## Перегрузка функций
 
@@ -315,14 +285,11 @@ void func(const char* str) {
 }
 
 int main() {
-```
-
-- func(10);      // int
-- func("aa");    // char*
-- //func(NULL);    // call is ambiguous
-- func(0);       // int
-- func(nullptr); //char*
-```cpp
+    func(10);    // int
+    func("aa");  // char*
+    // func(NULL);    // call is ambiguous
+    func(0);        // int
+    func(nullptr);  // char*
 }
 ```
 
@@ -340,12 +307,9 @@ void func(int* i) {
 
 int main() {
     int* i = nullptr;
-```
-
-- func(i);       // int*
-- func("aa");    // char*
-- func(nullptr); // call is ambigous
-```cpp
+    func(i);        // int*
+    func("aa");     // char*
+    func(nullptr);  // call is ambiguous
 }
 ```
 
@@ -362,7 +326,7 @@ void func(int* i) {
 }
 
 void func(std::nullptr_t null_pointer) {
-    std::cout << "std::nullptr" << std::endl;
+    std::cout << "std::nullptr_t" << std::endl;
 }
 ```
 
@@ -388,21 +352,11 @@ int main(int argc, char const* argv[]) {
 ## Аргументы по умолчанию
 
 
-```cpp
-#include <iostream>
-#include <vector>
-
-void printVector(const std::vector<int>& data, char delimiter = ',') {
-    for (const int& i : data) {
-        std::cout << i << delimiter;
-    }
-}
-
-int main() {
-    std::vector<int> v{1, 2, 3, 4, 5};
-    printVector(v);
-}
+```{.cpp filename="default-argument.cpp"}
+{{< include examples/05-references-initialization-functions-namespaces/default-argument.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-05-default-argument]{aria-label="Open in Compiler Explorer"}
 
 ## Инициализация
 
@@ -421,11 +375,11 @@ int main() {
 
 ```cpp
 int main() {
-    int k = 2;                         // copy initialization
-    int j(2);                          // direct initialization
-    int l{};                           // value initialization
-    std::string str{'a', 'b', 'c'};    // list initialization
-    SCircle circle{ {1, 2}, 3 };       // aggregate initialization
+    int k = 2;                       // copy initialization
+    int j(2);                        // direct initialization
+    int l{};                         // value initialization
+    std::string str{'a', 'b', 'c'};  // list initialization
+    SCircle circle{{1, 2}, 3};       // aggregate initialization
 }
 ```
 
@@ -434,9 +388,9 @@ int main() {
 ## namespace
 
 
-- Предотвращают конфликт имен
+- Предотвращают конфликты имён
 - Могут состоять из нескольких блоков
-- Упрощают “читабельность” кода
+- Помогают организовать код
 - Unnamed namespace
 - Namespace alias
 
@@ -490,11 +444,8 @@ using namespace Foo;
 using namespace Boo;
 
 int main() {
-```
-
-- f();        // call to 'f' is ambiguous
-```cpp
-return 0;
+    f();  // call to 'f' is ambiguous
+    return 0;
 }
 ```
 
@@ -506,11 +457,8 @@ using namespace Foo;
 using namespace Boo;
 
 int main() {
-```
-
-- f();        // call to 'f' is ambiguous
-```cpp
-return 0;
+    f();  // call to 'f' is ambiguous
+    return 0;
 }
 ```
 
@@ -568,20 +516,11 @@ int main() {
 ## namespace
 
 
-```cpp
-#include <iostream>
-
-namespace {
-void f() {
-    std::cout << "Unnamed namespace function\n";
-}
-}  // namespace
-
-int main() {
-    f();
-    return 0;
-}
+```{.cpp filename="unnamed-namespace.cpp"}
+{{< include examples/05-references-initialization-functions-namespaces/unnamed-namespace.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-05-unnamed-namespace]{aria-label="Open in Compiler Explorer"}
 
 ## namespace
 
@@ -618,3 +557,15 @@ int main() {
     std::cout << A::counter << std::endl;
 }
 ```
+
+[godbolt-05-swap-references]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'void+swap_values(int%26+left,+int%26+right)+%7B%0A++++int+temporary+%3D+left%3B%0A++++left+%3D+right%3B%0A++++right+%3D+temporary%3B%0A%7D%0A%0Aint+main()+%7B%0A++++int+first+%3D+10%3B%0A++++int+second+%3D+20%3B%0A++++swap_values(first,+second)%3B%0A%0A++++return+first+%3D%3D+20+%26%26+second+%3D%3D+10+%3F+0+:+1%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/05-references-initialization-functions-namespaces/swap-references.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-05-function-overload]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'int+test(int+value)+%7B%0A++++return+value%3B%0A%7D%0A%0Afloat+test(float+value)+%7B%0A++++return+value%3B%0A%7D%0A%0Aint+main()+%7B%0A++++return+test(10.2F)+%3D%3D+10.2F+%3F+0+:+1%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/05-references-initialization-functions-namespaces/function-overload.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-05-default-argument]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%23include+%3Cvector%3E%0A%0Avoid+print_vector(const+std::vector%3Cint%3E%26+data,+char+delimiter+%3D+!',!')+%7B%0A++++for+(int+value+:+data)+%7B%0A++++++++std::cout+%3C%3C+value+%3C%3C+delimiter%3B%0A++++%7D%0A++++std::cout+%3C%3C+!'%5Cn!'%3B%0A%7D%0A%0Aint+main()+%7B%0A++++std::vector%3Cint%3E+values%7B1,+2,+3,+4,+5%7D%3B%0A++++print_vector(values)%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/05-references-initialization-functions-namespaces/default-argument.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-05-unnamed-namespace]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Anamespace+%7B%0Avoid+print_message()+%7B%0A++++std::cout+%3C%3C+%22Unnamed+namespace+function%5Cn%22%3B%0A%7D%0A%7D++//+namespace%0A%0Aint+main()+%7B%0A++++print_message()%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/05-references-initialization-functions-namespaces/unnamed-namespace.cpp" compiler="clang2310" options="-std=c++20 -O0" -->

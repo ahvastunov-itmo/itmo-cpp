@@ -6,8 +6,6 @@ title: "Лекция 18. Категории значений и семантик
 
 [Открыть слайды](slides/18-value-categories-move-semantics.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1e5ypC_v9q1hhPUMKDSabFFJB1arI4-yWHbs1hJTcJqo/edit)
-
 :::
 
 ## Язык С++
@@ -39,22 +37,16 @@ title: "Лекция 18. Категории значений и семантик
 ```cpp
 int main() {
     int i;
-```
-
-- i = 2024; // i - lvalue, 2024 - rvalue
-- 2024 = i; // Compile-time error
-```cpp
-int arr[10];
-```
-
-- arr[1] = i;   // arr[1] - lvalue, i - lvalue
-```cpp
-return 0;
+    i = 2024;  // i - lvalue, 2024 - rvalue
+    2024 = i;  // Compile-time error
+    int arr[10];
+    arr[1] = i;  // arr[1] - lvalue, i - lvalue
+    return 0;
 }
 ```
 
-- Выражение относящееся к объекту, который занимает место в памяти
-- rvalue - все что не lvalue. Не обязан иметь выделенное место
+- Выражение, относящееся к объекту, который занимает место в памяти
+- rvalue — всё, что не является lvalue. Не обязано иметь выделенное место
 - При присваивании левый операнд всегда lvalue, правый lvalue или rvalue
 - Не справедливо для современного С++
 
@@ -67,17 +59,11 @@ return 0;
 ```cpp
 int i = 1;  // lvalue
 int j = 2;  // lvalue
-```
-
-- i + j;      // rvalue
-- i + j = 2;  // Compile-time error
-- &i;         // rvalue
-```cpp
+i + j;      // rvalue
+i + j = 2;  // Compile-time error
+&i;         // rvalue
 int* pi = &i;
-```
-
-- *pi;        // lvalue
-```cpp
+*pi;              // lvalue
 const int k = 1;  // lvalue
 ```
 
@@ -112,11 +98,8 @@ int func(int& i) {
 int main() {
     int x = 2;
     func(x);
-```
-
-- func(2);  // Error
-```cpp
-return 0;
+    func(2);  // Error
+    return 0;
 }
 
 int func(const int& i) {
@@ -154,26 +137,25 @@ int main() {
 ```cpp
 struct Foo {
     Foo() = default;
-    Foo(int i) : value(i) {}
+    Foo(int i) : value(i) {
+    }
     int value = 0;
 };
 
-void func(const Foo& v) {}
+void func(const Foo& v) {
+}
 
 int main() {
-```
-
-- func(Foo{}); // creating temprorary object
-- func(2);     // creating temprorary object
-- Foo{}.value; // creating temprorary object
-```cpp
-return 0;
+    func(Foo{});  // creating temporary object
+    func(2);      // creating temporary object
+    Foo{}.value;  // creating temporary object
+    return 0;
 }
 ```
 
 - Rvalue
 - prvalue - pure rvalue
-- xrvalue - expiring rvalue
+- xvalue — expiring value
 
 ## Rvalue reference
 
@@ -230,10 +212,7 @@ int main(int, char**) {
     foo(f);
     foo(cf);
     foo(Foo{});
-```
-
-- foo(rvf);  // !!!
-```cpp
+    foo(rvf);  // !!!
 }
 ```
 
@@ -284,7 +263,7 @@ int main() {
        : size_(std::exchange(array.size_, 0))
        , data_(std::exchange(array.data_, nullptr))
    {
-   }
+       }
 
        CArray& operator=(CArray&& array) noexcept {
            delete[] data_;
@@ -299,9 +278,9 @@ int main() {
 
 
 - Передают все значения полей в текущий объект
-- Оставляют копируемый объект в инвариантном но неопределенном состоянии
+- Оставляют перемещённый объект в корректном, но неопределённом состоянии
 - Очищают ресурсы текущего объекта
-- default\delete
+- default/delete
 - Правило 5
 - Правило 0
 
@@ -319,13 +298,10 @@ int main() {
 int main() {
     CArray arr1{5};
     CArray arr2{};
-```
-
-- arr2 = arr1;          // lvalue
-- arr2 = createArray(); // prvalue
-```cpp
-arr2 = std::move(arr1);  // xvalue
-return 0;
+    arr2 = arr1;             // lvalue
+    arr2 = createArray();    // prvalue
+    arr2 = std::move(arr1);  // xvalue
+    return 0;
 }
 ```
 
@@ -340,7 +316,7 @@ typename remove_reference<T>::type&& move(T&& t) noexcept {
 }
 ```
 
-- Кастит в rvalue
+- Преобразует выражение в xvalue
 
 ## Copy-And-Swap Idiom
 
@@ -369,7 +345,8 @@ void std::swap(T& x, T& y) {
 
 ```cpp
 template <typename T>
-void function(T&& value) {}
+void function(T&& value) {
+}
 
 int main(int, char**) {
     Foo&& foo = Foo{};
@@ -435,16 +412,14 @@ int main() {
 
 ```cpp
 template <typename T>
-T&& forward(std::remove_reference_t<T>& t) c {
+T&& forward(std::remove_reference_t<T>& t) {
     return static_cast<T&&>(t);
 }
 ```
 
-- lvalue скастит к lvalue
-- rvalue скастит к rvalue
-```cpp
-в отличии от std::move который делает это безусловно
-```
+- lvalue передаётся дальше как lvalue
+- rvalue передаётся дальше как rvalue
+- В отличие от `std::move`, `std::forward` сохраняет исходную категорию значения
 
 ## Perfect forwarding
 
@@ -474,16 +449,21 @@ std::unique_ptr<T> my_make_unique(Arg&&... arg) {
 
 
 ```cpp
-void boo(Boo&) {}
+void boo(Boo&) {
+}
 
-void boo(const Boo&) {}
+void boo(const Boo&) {
+}
 
-void boo(Boo&&) {}
+void boo(Boo&&) {
+}
 
-void boo(const Boo&&) {}
+void boo(const Boo&&) {
+}
 
 template <typename T>
-void boo(T&&) {}
+void boo(T&&) {
+}
 ```
 
 ## Copy elision

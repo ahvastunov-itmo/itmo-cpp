@@ -6,8 +6,6 @@ title: "Лекция 8. Перегрузка операторов"
 
 [Открыть слайды](slides/08-operator-overloading.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/14JylCkORlmfPvXOP9rV8Qtup1Js-lVg6ijmNCRoNCPo/edit)
-
 :::
 
 ## Язык С++
@@ -35,11 +33,9 @@ title: "Лекция 8. Перегрузка операторов"
 
 - Оператор присваивания: =
 - Специальные:
-- ∙ префиксные * &,
-```cpp
-∙ постфиксные->->*, ∙ особые, .::
-```
-
+- префиксные: `*`, `&`
+- постфиксные: `->`, `->*`
+- особые: `.`, `::`
 - Скобки: [] ()
 - Оператор приведения (type)
 - Тернарный оператор: x ? y : z
@@ -50,14 +46,9 @@ title: "Лекция 8. Перегрузка операторов"
 
 - Не должна противоречить здравой логике
 - Как член класса или как глобальная функция
-```cpp
-[], (), -> , = -всегда члены класса
-```
-
-- Ввод (>>) и вывод(<<)  всегда глобальные функции
-```cpp
-Операторы ::, .*, ., ?: перегружать нельзя
-```
+- `[]`, `()`, `->`, `=` всегда перегружаются как члены класса
+- Ввод `>>` и вывод `<<` обычно перегружаются как глобальные функции
+- Операторы `::`, `.*`, `.`, `?:` перегружать нельзя
 
 - Новые операторы сделать нельзя
 
@@ -78,7 +69,7 @@ a->| (a).operator->() |
 ## CRational
 
 
-- /*   Класс из первой лекции */
+- Класс из предыдущей лекции
 ```cpp
 class CRational {
    public:
@@ -122,7 +113,7 @@ std::ostream& operator<<(std::ostream& stream, const CRational& value) {
 }
 ```
 
-- Операторы ввода\вывода:
+- Операторы ввода/вывода:
 - operator<< & operator>>
 - Не как члены класса
 
@@ -151,11 +142,8 @@ std::istream& operator>>(std::istream& stream, CRational& r) {
 bool operator==(const CRational& lhs, const CRational& rhs) {
     return lhs.numerator() * rhs.denominator() == rhs.numerator() * lhs.denominator();
 }
-```
-
-- bool operator!=(const CRational& lhs, const CRational& rhs) {
-```cpp
-return !operator==(lhs, rhs);
+bool operator!=(const CRational& lhs, const CRational& rhs) {
+    return !operator==(lhs, rhs);
 }
 ```
 
@@ -166,17 +154,11 @@ return !operator==(lhs, rhs);
 ```cpp
 return lhs.numerator() * rhs.denominator() < rhs.numerator() * lhs.denominator();
 }
-```
-
-- bool operator>(const CRational& lhs, const CRational& rhs) {
-```cpp
-return (rhs < lhs);
+bool operator>(const CRational& lhs, const CRational& rhs) {
+    return (rhs < lhs);
 }
-```
-
-- bool operator<=(const CRational& lhs, const CRational& rhs) {
-```cpp
-return !operator>(lhs, rhs);
+bool operator<=(const CRational& lhs, const CRational& rhs) {
+    return !operator>(lhs, rhs);
 }
 ```
 
@@ -189,14 +171,11 @@ return !operator>(lhs, rhs);
 numerator_ += denominator_;
 return *this;
 }
-```
-
-- // postfix operator
-- CRational operator++(int) {
-```cpp
-CRational tmp(*this);
-operator++();
-return tmp;
+// postfix operator
+CRational operator++(int) {
+    CRational tmp(*this);
+    operator++();
+    return tmp;
 }
 ```
 
@@ -230,19 +209,15 @@ std::ostream& operator<<(std::ostream& stream, const CRational& value) {
 ```cpp
 class CIntArray {
    public:
-```
+    // …
+    `int& operator[](size_t idx) {
+        ` return data_[xidx];
+    }
 
-- // …
-- `int& operator[](size_t idx) {`
-```cpp
-return data_[xidx];
-}
-
-private:
-int* data_;
-size_t size_;
-}
-;
+   private:
+    int* data_;
+    size_t size_;
+};
 ```
 
 ## Functor or functional object
@@ -251,24 +226,15 @@ size_t size_;
 ```cpp
 class CMult {
    public:
-```
+    explicit CMult(int mult) : mult_(mult) {
+    }
+    int operator()(int value) {
+        return mult_ * value;
+    }
 
-- explicit CMult(int mult)
-- :mult_(mult)
-```cpp
-{
-}
-```
-
-- int operator()(int value) {
-```cpp
-return mult_ * value;
-}
-
-private:
-int mult_;
-}
-;
+   private:
+    int mult_;
+};
 ```
 
 ## operator()
@@ -295,26 +261,19 @@ class CFileDescriptor {
     explicit CFileDescriptor(const char* path, const char* mode) {
         file_ = fopen(path, mode);
         if (file_ == nullptr) {
-```
+            // throw some exception (see next lection)
+        }
+    }
+    operator FILE*() {
+        return file_;
+    }
+    ~CFileDescriptor() {
+        if (file_ != nullptr) fclose(file_);
+    }
 
-- // throw some exception (see next lection)
-```cpp
-}
-}
-```
-
-- operator FILE*() {
-```cpp
-return file_;
-}
-~CFileDescriptor() {
-    if (file_ != nullptr) fclose(file_);
-}
-
-private:
-FILE* file_;
-}
-;
+   private:
+    FILE* file_;
+};
 ```
 
 ## operator->, operator*
@@ -338,22 +297,16 @@ class Foo {
 ```cpp
 class FooPtr {
    public:
-```
+    explicit FooPtr(Foo* ptr = nullptr) : ptr_(ptr) {
+    }
 
-- explicit FooPtr(Foo* ptr = nullptr)
-- : ptr_(ptr)
-```cpp
-{
-}
+    ~FooPtr() {
+        delete ptr_;
+    }
 
-~FooPtr() {
-    delete ptr_;
-}
-
-private:
-Foo* ptr_;
-}
-;
+   private:
+    Foo* ptr_;
+};
 ```
 
 ## operator->, operator*
@@ -362,21 +315,17 @@ Foo* ptr_;
 ```cpp
 class FooPtr {
    public:
-```
+    Foo& operator*() {
+        return *ptr_;
+    }
 
-- Foo& operator*() {
-```cpp
-return *ptr_;
-}
+    Foo* operator->() {
+        return ptr_;
+    }
 
-Foo* operator->() {
-    return ptr_;
-}
-
-private:
-Foo* ptr_;
-}
-;
+   private:
+    Foo* ptr_;
+};
 ```
 
 ## operator->, operator*

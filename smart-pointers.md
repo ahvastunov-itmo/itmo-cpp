@@ -6,8 +6,6 @@ title: "Умные указатели"
 
 [Открыть слайды](slides/smart-pointers.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1CAhC_sj_HBR5taAUitA-6_-Yi9MODDhrQioBoT8Gz_I/edit)
-
 :::
 
 ## Язык С++
@@ -20,9 +18,9 @@ title: "Умные указатели"
 
 - Resource acquisition is initialization
 - Захват ресурса - есть инициализация
-- Обеспечивает инкапсуляция ресурса и инвариант состояния
-- Безопасна к исключениям для объектов лежащих на стеке
-- Применяется для указателей, мьютексов, файлов,....
+- Обеспечивает инкапсуляцию ресурса и поддержание инварианта
+- Обеспечивает безопасность при исключениях для объектов, лежащих на стеке
+- Применяется для указателей, мьютексов, файлов и других ресурсов
 
 ## RAII (Resource Acquisition Is Initialization)
 
@@ -33,26 +31,19 @@ class CFileDescriptor {
     explicit CFileDescriptor(const char* path, const char* mode) {
         file_ = fopen(path, mode);
         if (file_ == nullptr) {
-```
+            // throw some exception (see next lection)
+        }
+    }
+    operator FILE*() {
+        return file_;
+    }
+    ~CFileDescriptor() {
+        if (file_ != nullptr) fclose(file_);
+    }
 
-- // throw some exception (see next lection)
-```cpp
-}
-}
-```
-
-- operator FILE*() {
-```cpp
-return file_;
-}
-~CFileDescriptor() {
-    if (file_ != nullptr) fclose(file_);
-}
-
-private:
-FILE* file_;
-}
-;
+   private:
+    FILE* file_;
+};
 ```
 
 ## operator->, operator*
@@ -76,22 +67,16 @@ class Foo {
 ```cpp
 class FooPtr {
    public:
-```
+    explicit FooPtr(Foo* ptr = nullptr) : ptr_(ptr) {
+    }
 
-- explicit FooPtr(Foo* ptr = nullptr)
-- : ptr_(ptr)
-```cpp
-{
-}
+    ~FooPtr() {
+        delete ptr_;
+    }
 
-~FooPtr() {
-    delete ptr_;
-}
-
-private:
-Foo* ptr_;
-}
-;
+   private:
+    Foo* ptr_;
+};
 ```
 
 ## operator->, operator*
@@ -100,21 +85,17 @@ Foo* ptr_;
 ```cpp
 class FooPtr {
    public:
-```
+    Foo& operator*() {
+        return *ptr_;
+    }
 
-- Foo& operator*() {
-```cpp
-return *ptr_;
-}
+    Foo* operator->() {
+        return ptr_;
+    }
 
-Foo* operator->() {
-    return ptr_;
-}
-
-private:
-Foo* ptr_;
-}
-;
+   private:
+    Foo* ptr_;
+};
 ```
 
 ## operator->, operator*
@@ -156,22 +137,16 @@ void func() {
 template <class T>
 class auto_ptr {
    public:
-```
+    auto_ptr(T* ptr = nullptr) : ptr_(ptr) {
+    }
 
-- auto_ptr(T* ptr = nullptr)
-- :ptr_(ptr)
-```cpp
-{
-}
+    ~auto_ptr() {
+        delete ptr_;
+    }
 
-~auto_ptr() {
-    delete ptr_;
-}
-
-private:
-T* ptr_;
-}
-;
+   private:
+    T* ptr_;
+};
 ```
 
 - auto_ptr владеет указателем, отвечает за время его жизни
@@ -204,11 +179,7 @@ void func() {
     auto_ptr<Boo> p = b;
     throw std::runtime_error("Error");
 }
-```
-
-- auto_ptr(auto_ptr& other)
-- : ptr_(other.release()){
-```cpp
+auto_ptr(auto_ptr& other) : ptr_(other.release()) {
 }
 
 T* release() {
@@ -218,7 +189,7 @@ T* release() {
 }
 ```
 
-- При копировании, владение передается другому объекту
+- При копировании владение передаётся другому объекту
 
 ## auto_ptr
 
@@ -255,21 +226,15 @@ void func() {
 T* operator->() const {
     return ptr_;
 }
-```
-
-- T& operator*() const {
-```cpp
-return ptr_;
+T& operator*() const {
+    return ptr_;
 }
 ```
 
 ## auto_ptr
 
 
-```cpp
-В<memory> есть std::auto_ptr
-```
-
+- В `<memory>` был объявлен `std::auto_ptr`
 - deprecated in C++11
 - removed in C++17
 
@@ -317,17 +282,13 @@ std::default_deleter
 
 ```cpp
 struct FileDeleter {
-```
-
-- void operator()(FILE* file){
-```cpp
-if (file != nullptr) {
-    fclose(file);
-    file = nullptr;
-}
-}
-}
-;
+    void operator()(FILE* file) {
+        if (file != nullptr) {
+            fclose(file);
+            file = nullptr;
+        }
+    }
+};
 
 int main() {
     std::unique_ptr<FILE, FileDeleter> f{fopen("temp.txt", "w")};
@@ -338,10 +299,10 @@ int main() {
 ## std::shared_ptr
 
 
-- Атомарный счетчик
-- Копирование увеличивает счетчик
+- Атомарный счётчик
+- Копирование увеличивает счётчик
 - Деструктор уменьшает
-- Уничтожение при счетчике = 0
+- Уничтожение при достижении счётчиком нуля
 ```cpp
 std::make_shared
 ```
@@ -392,10 +353,7 @@ void func() {
     std::shared_ptr<B> b{new B()};
     a->ptr = b;
     b->ptr = a;
-```
-
-- // nothing will be deleted
-```cpp
+    // nothing will be deleted
 }
 ```
 
@@ -403,9 +361,8 @@ void func() {
 
 
 - Не владеет объектом
-- Может вернуть shared_ptr через Lock
-- Знает количество
-- user_count
+- Может вернуть `shared_ptr` через `lock()`
+- Позволяет узнать количество владельцев через `use_count()`
 - expired
 - bad_weak_ptr
 

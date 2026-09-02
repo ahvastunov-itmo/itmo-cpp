@@ -6,8 +6,6 @@ title: "Лекция 17. Лямбда-выражения"
 
 [Открыть слайды](slides/17-lambda.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/17EpE__hciP3z2k_GDZLE2Nfpu3nSUrxmv5miqdNW_7Y/edit)
-
 :::
 
 ## Язык С++
@@ -130,14 +128,10 @@ int main() {
 
 ```cpp
 struct Printer {
-```
-
-- void operator()(int value) const {
-```cpp
-std::cout << value << " ";
-}
-}
-;
+    void operator()(int value) const {
+        std::cout << value << " ";
+    }
+};
 
 int main() {
     std::vector<int> v = {1, 2, 3, 4, 5, 6, 7};
@@ -154,24 +148,15 @@ int main() {
 
 ```cpp
 struct Printer {
-```
+    Printer() : counter(0) {
+    }
+    void operator()(int value) const {
+        std::cout << value << " ";
+        ++counter;
+    }
 
-- Printer()
-- : counter(0)
-```cpp
-{
-}
-```
-
-- void operator()(int value) const {
-```cpp
-std::cout << value << " ";
-++counter;
-}
-
-mutable size_t counter;
-}
-;
+    mutable size_t counter;
+};
 
 int main() {
     std::vector<int> v = {1, 2, 3, 4, 5, 6, 7};
@@ -182,14 +167,14 @@ int main() {
 }
 ```
 
-## std
+## Стандартные функциональные объекты
 
 
 ```cpp
-std::less std::equal_to std::plus std::logical_to
+std::less std::equal_to std::plus std::logical_and
 ```
 
-- etc (<functional>)
+- Другие функциональные объекты объявлены в `<functional>`
 
 ## Functor
 
@@ -212,42 +197,27 @@ int main() {
 
 
 ```cpp
-class GreaterThen {
+class GreaterThan {
    public:
-```
+    GreaterThan(int limit) : limit_(limit) {
+    }
+    bool operator()(int value) const {
+        return value > limit_;
+    }
 
-- GreaterThen(int limit)
-- : limit_(limit)
-```cpp
-{
-}
-```
-
-- bool operator()(int value) const {
-```cpp
-return value > limit_;
-}
-
-private:
-int limit_;
-}
-;
+   private:
+    int limit_;
+};
 
 int main() {
     std::vector<int> v = {1, 2, 3, 4, 5, 6, 7};
 
-   auto it = std::find_if(
-```
+    auto it = std::find_if(v.begin(), v.end(), GreaterThan{4});
 
-- v.begin(), v.end(),
-- GreaterThen{4}
-```cpp
-   );
+    if (it != v.end()) std::cout << *it;
 
-   if (it != v.end()) std::cout << *it;
-
-   return 0;
-   }
+    return 0;
+}
 ```
 
 ## Functor
@@ -257,18 +227,13 @@ int main() {
 int main() {
     std::vector<int> v = {1, 2, 3, 4, 5, 6, 7};
 
-   auto it = std::find_if(
-```
+    auto it =
+        std::find_if(v.begin(), v.end(), std::bind(std::greater<int>{}, std::placeholders::_1, 4));
 
-- v.begin(), v.end(),
-```cpp
-       std::bind(std::greater<int>{}, std::placeholders::_1, 4)
-   );
+    if (it != v.end()) std::cout << *it;
 
-       if (it != v.end()) std::cout << *it;
-
-       return 0;
-       }
+    return 0;
+}
 ```
 
 - Частичное применение
@@ -287,35 +252,26 @@ int main() {
 int main() {
     std::vector<int> v = {1, 2, 3, 4, 5, 6, 7};
 
-   auto it = std::find_if(
-```
+    auto it = std::find_if(v.begin(), v.end(),
+`[](int value) { return value > 4; }` );
 
-- v.begin(), v.end(),
-- `[](int value) { return value > 4; }`
-```cpp
-   );
+    if (it != v.end()) std::cout << *it;
 
-   if (it != v.end()) std::cout << *it;
-
-   return 0;
-   }
+    return 0;
+}
 ```
 
 ## Lambda
 
 
-- Замыкание, позволяет создавать неименованные функторы, с захватом переменных из текущей области видимости.
+- Лямбда создаёт неименованный функциональный объект и может захватывать переменные из текущей области видимости.
+
 ```cpp
-[capture](params) attrs -> return {
-    body
-}
+[capture](parameters) attributes -> return_type { statements }
 ```
 
-- (params) - optional
-- attrs - optional
-```cpp
-->return -optional
-```
+- `parameters`, `attributes` и `return_type` могут отсутствовать
+- Тип возвращаемого значения обычно выводится автоматически
 
 ## Lambda
 
@@ -337,99 +293,29 @@ int x = 1;
 ## Lambda
 
 
-```cpp
-int main() {
-    auto f = [](int value) { return value > 4; };
-    f(1);
-
-    return 0;
-}
+```{.cpp filename="basic-lambda.cpp"}
+{{< include examples/17-lambda/basic-lambda.cpp >}}
 ```
 
-- int main()
-```cpp
-{
-    class __lambda_6_14 {
-       public:
-```
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-17-basic-lambda]{aria-label="Open in Compiler Explorer"}
 
-- bool operator()(int value) const {
-```cpp
-return value > 4;
-}
-}
-;
-
-__lambda_6_14 f = __lambda_6_14{};
-f.operator()(1);
-return 0;
-}
-```
+Компилятор создаёт для каждой лямбды отдельный безымянный тип с `operator()`.
 
 - <https://cppinsights.io/>
 
-## Lambda
+## Каждая лямбда имеет собственный тип
 
 
-- int main()
-```cpp
-{
-    auto first = [](int x) { return x + 1; };
-    auto second = [](int x) { return x + 1; };
+```{.cpp filename="lambda-types.cpp"}
+{{< include examples/17-lambda/lambda-types.cpp >}}
 ```
 
-- static_assert(
-```cpp
-!std::is_same <
-```
-
-- decltype(first),
-- decltype(second)
-```cpp
-> ::value,
-```
-
-- "must be different!"
-```cpp
- );
- }
-```
-
-- int main()
-```cpp
-{
-    class __lambda_6_14 {
-       public:
-```
-
-- int operator()(int value) const {
-```cpp
-return x + 1;
-}
-}
-;
-
-__lambda_6_14 f = __lambda_6_14{};
-
-class __lambda_6_17 {
-   public:
-```
-
-- int operator()(int value) const {
-```cpp
-return x + 1;
-}
-}
-;
-
-__lambda_6_17 = __lambda_6_17{};
-}
-```
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-17-lambda-types]{aria-label="Open in Compiler Explorer"}
 
 ## Capture
 
 
-- [x,y] - by value
+- [x, y] - by value
 - [=] - all by value with automatic storage duration
 - [&x, &y]  - by reference
 - [&] - all by reference with automatic storage duration
@@ -452,28 +338,18 @@ int y = 2;
 
 class __lambda_7_12 {
    public:
-```
+    inline int operator()(int v) const {
+        return (v + x) + y;
+    }
 
-- inline int operator()(int v) const {
-```cpp
-return (v + x) + y;
-}
+   private:
+    int x;
+    int& y;
 
-private:
-int x;
-int& y;
-
-public:
-```
-
-- __lambda_7_12(int & _x, int & _y)
-- : x{_x}
-- , y{_y}
-```cpp
-{
-}
-}
-;
+   public:
+    __lambda_7_12(int& _x, int& _y) : x{_x}, y{_y} {
+    }
+};
 
 __lambda_7_12 f = __lambda_7_12{x, y};
 ```
@@ -497,32 +373,22 @@ struct Foo {
     inline int func(int i) {
         class __lambda_8_16 {
            public:
-```
+            inline int operator()(int value) const {
+                return __this->field + value;
+            }
 
-- inline int operator()(int value) const{
-```cpp
-return __this->field + value;
-}
+           private:
+            Foo* __this;
 
-private:
-Foo* __this;
+           public:
+            __lambda_8_16(Foo* _this) : __this{_this} {
+            }
+        };
 
-public:
-```
-
-- __lambda_8_16(Foo * _this)
-- : __this{_this}
-```cpp
-{
-}
-}
-;
-
-__lambda_8_16 f = __lambda_8_16{this};
-return this->func(i);
-}
-}
-;
+        __lambda_8_16 f = __lambda_8_16{this};
+        return this->func(i);
+    }
+};
 ```
 
 ## Capture
@@ -543,32 +409,22 @@ struct Foo {
     inline int func(int i) {
         class __lambda_8_16 {
            public:
-```
+            inline int operator()(int value) const {
+                return (&__this)->field + value;
+            }
 
-- inline int operator()(int value) const{
-```cpp
-return (&__this)->field + value;
-}
+           private:
+            Foo __this;
 
-private:
-Foo __this;
+           public:
+            __lambda_8_16(const Foo& _this) : __this{_this} {
+            }
+        };
 
-public:
-```
-
-- __lambda_8_16(const Foo & _this)
-- : __this{_this}
-```cpp
-{
-}
-}
-;
-
-__lambda_8_16 f = __lambda_8_16{*this};
-return this->func(i);
-}
-}
-;
+        __lambda_8_16 f = __lambda_8_16{*this};
+        return this->func(i);
+    }
+};
 ```
 
 ## Mutable
@@ -620,19 +476,16 @@ Foo createFooA();
 Foo createFooB();
 
 int main() {
-```
+    Foo f;  // too expensive
+    bool someCondition = true;
 
-- Foo f;    // too expensive
-```cpp
-bool someCondition;
+    if (someCondition) {
+        f = createFooA();
+    } else {
+        f = createFooB();
+    }
 
-if (someCondition) {
-    f = createFooA();
-} else {
-    f = createFooB();
-}
-
-return 0;
+    return 0;
 }
 ```
 
@@ -654,7 +507,7 @@ Foo createFooB();
 int main() {
     const Foo f;  // compile-time error
 
-    bool someCondition;
+    bool someCondition = true;
 
     if (someCondition) {
         f = createFooA();
@@ -682,19 +535,16 @@ Foo createFooA();
 Foo createFooB();
 
 int main() {
-```
+    Foo f;  // compile-time error
+    bool someCondition = true;
 
-- Foo f;  // compile-time error
-```cpp
-bool someCondition;
+    if (someCondition) {
+        f = createFooA();
+    } else {
+        f = createFooB();
+    }
 
-if (someCondition) {
-    f = createFooA();
-} else {
-    f = createFooB();
-}
-
-return 0;
+    return 0;
 }
 ```
 
@@ -714,7 +564,7 @@ Foo createFooA();
 Foo createFooB();
 
 int main() {
-    bool someCondition;
+    bool someCondition = true;
 
     const Foo f = [someCondition]() {
         if (someCondition) {
@@ -744,7 +594,7 @@ Foo createFooA();
 Foo createFooB();
 
 int main() {
-    bool someCondition;
+    bool someCondition = true;
 
     const Foo f = std::invoke([someCondition]() {
         if (someCondition) {
@@ -764,37 +614,24 @@ int main() {
 ```cpp
 template <typename T, typename U>
 struct SimpleOverloader : public T, U {
-```
+    SimpleOverloader(T first, U second) : T(first), U(second) {
+    }
 
-- SimpleOverloader(T t, U u) : T(t), U(u)
-```cpp
-{
-}
-
-using T::operator();
-using U::operator();
-}
-;
+    using T::operator();
+    using U::operator();
+};
 
 template <typename T, typename U>
-```
-
-- SimpleOverloader<T,U>  MakeOverloaded(
-```cpp
-const T &t, const U &u
-```
-
-- ){
-```cpp
-return SimpleOverloader<T, U>(t, u);
+SimpleOverloader<T, U> MakeOverloaded(const T& first, const U& second) {
+    return SimpleOverloader<T, U>(first, second);
 }
 
 int main() {
-    auto o = MakeOverloaded([](int i) { std::cout << "int\n"; },
-                            [](float i) { std::cout << "float\n"; });
+    auto overloaded =
+        MakeOverloaded([](int) { std::cout << "int\n"; }, [](float) { std::cout << "float\n"; });
 
-    o(1);
-    o(1.1f);
+    overloaded(1);
+    overloaded(1.1F);
 
     return 0;
 }
@@ -832,22 +669,18 @@ int main() {
 
     return 0;
 }
-
-class __lambda_10_19 {
-   public:
-    template <class type_parameter_0_0, class type_parameter_0_1
 ```
 
-- >
-- inline auto operator()(
-- type_parameter_0_0 x,
-- type_parameter_0_1 y
-- ) const  {
+Упрощённое представление типа лямбды:
+
 ```cpp
-return x + y;
-}
-}
-;
+class __lambda_10_19 {
+   public:
+    template <class T, class U>
+    auto operator()(T x, U y) const {
+        return x + y;
+    }
+};
 ```
 
 ## Recursive Lambda
@@ -871,39 +704,11 @@ int main() {
 ## Function Pointer & Lambda
 
 
-```cpp
-int main() {
-    auto f = [](int value) { return value > 4; };
-
-    return 0;
-}
-
-class __lambda_4_13 {
-   public:
+```{.cpp filename="lambda-to-function-pointer.cpp"}
+{{< include examples/17-lambda/lambda-to-function-pointer.cpp >}}
 ```
 
-- inline /*constexpr */ bool operator()(int value) const
-```cpp
-{
-    return value > 4;
-}
-
-using retType_4_13 = bool (*)(int);
-```
-
-- inline constexpr operator retType_4_13 () const noexcept
-```cpp
-{
-    return __invoke;
-};
-
-private:
-static inline /*constexpr */ bool __invoke(int value) {
-    return __lambda_4_13{}.operator()(value);
-}
-}
-;
-```
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-17-lambda-function-pointer]{aria-label="Open in Compiler Explorer"}
 
 ## Array of lambda
 
@@ -947,15 +752,9 @@ int main() {
 
     std::function<int(const Foo&, int)> f4 = &Foo::incr;
 
-    std::cout << f(1) << " "
-```
+    std::cout << f(1) << ' ' << f2(1) << ' ' << f3(1) << ' ' << f4(Foo{}, 1) << std::endl;
 
-- << f2(1) << " "
-- << f3(1) << " "
-```cpp
-             << f4(Foo{}, 1) << std::endl;
-
-   return 0;
+    return 0;
 }
 ```
 
@@ -963,3 +762,12 @@ int main() {
 
 
 - // simple implementation
+
+[godbolt-17-basic-lambda]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'int+main()+%7B%0A++++auto+is_greater_than_four+%3D+%5B%5D(int+value)+%7B+return+value+%3E+4%3B+%7D%3B%0A%0A++++return+is_greater_than_four(5)+%3F+0+:+1%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/17-lambda/basic-lambda.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-17-lambda-types]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ctype_traits%3E%0A%0Aint+main()+%7B%0A++++auto+first+%3D+%5B%5D(int+value)+%7B+return+value+%2B+1%3B+%7D%3B%0A++++auto+second+%3D+%5B%5D(int+value)+%7B+return+value+%2B+1%3B+%7D%3B%0A%0A++++static_assert(!!std::is_same_v%3Cdecltype(first),+decltype(second)%3E)%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/17-lambda/lambda-types.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-17-lambda-function-pointer]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'int+main()+%7B%0A++++auto+is_greater_than_four+%3D+%5B%5D(int+value)+%7B+return+value+%3E+4%3B+%7D%3B%0A++++bool+(*function_pointer)(int)+%3D+is_greater_than_four%3B%0A%0A++++return+function_pointer(5)+%3F+0+:+1%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/17-lambda/lambda-to-function-pointer.cpp" compiler="clang2310" options="-std=c++20 -O0" -->

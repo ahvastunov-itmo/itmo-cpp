@@ -6,8 +6,6 @@ title: "Лекция 20. Шаблонное метапрограммирован
 
 [Открыть слайды](slides/20-template-metaprogramming.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1pI7DRfTnDS_f5YLhoj6YMc7jwO4-C6jUcxNBxOMsZnE/edit)
-
 :::
 
 ## Язык С++
@@ -26,30 +24,23 @@ struct Factorial {
 
 template <>
 struct Factorial<0> {
-    enum {
-```
-
-- value = 1
-```cpp
-}
-;
-}
-;
+    enum { value = 1 };
+};
 ```
 
 ## constexpr
 
 
-- Позволяет переменной или функции быть вычисленной в compile-time
+- Позволяет вычислить переменную или функцию во время компиляции
 - constexpr variable
 - Литеральный тип
-- Инициализация через константное выражение (явно, constexpr функция и тд)
+- Инициализация константным выражением, например результатом `constexpr`-функции
 - constexpr function
 - Возвращает литеральный тип
 - Содержит переменные литеральных типов
 - Не виртуальная
 - Без исключений
-- и тд
+- И так далее
 
 ## constexpr
 
@@ -101,11 +92,8 @@ void print(T value) {
 }
 
 template <>
-```
-
-- void print<int>(int value) {
-```cpp
-std::cout << "Int value = " << value << std::endl;
+void print<int>(int value) {
+    std::cout << "Int value = " << value << std::endl;
 }
 
 int main() {
@@ -124,11 +112,8 @@ void print(T value) {
 }
 
 template <>
-```
-
-- void print<int>(int value) {
-```cpp
-std::cout << "Int value = " << value << std::endl;
+void print<int>(int value) {
+    std::cout << "Int value = " << value << std::endl;
 }
 
 template <typename T>
@@ -202,24 +187,11 @@ int main() {
 ## is_same (naive)
 
 
-```cpp
-template <typename T, typename U>
-struct is_same {
-    static constexpr bool value = false;
-};
-
-template <typename T>
-struct is_same<T, T> {
-    static constexpr bool value = true;
-};
-
-int main() {
-    static_assert(is_same<int, int>::value);
-    static_assert(!is_same<int, float>::value);
-    static_assert(!is_same<int, int&>::value);
-    static_assert(!is_same<const int, int>::value);
-}
+```{.cpp filename="naive-is-same.cpp"}
+{{< include examples/20-template-metaprogramming/naive-is-same.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-20-naive-is-same]{aria-label="Open in Compiler Explorer"}
 
 ## Metafunction (values)
 
@@ -247,30 +219,20 @@ int main() {
 ## Metafunction (values)
 
 
-```cpp
-template <auto Value>
-struct value_identity {
-    static constexpr auto value = Value;
-};
-
-int main() {
-    static_assert(value_identity<239>::value == 239);
-}
+```{.cpp filename="value-identity.cpp"}
+{{< include examples/20-template-metaprogramming/value-identity.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-20-value-identity]{aria-label="Open in Compiler Explorer"}
 
 ## Metafunction (values)
 
 
-```cpp
-template <auto... Value>
-struct sum {
-    static constexpr auto value = (Value + ...);
-};
-
-int main() {
-    static_assert(sum<1, 2, 3, 4, 5>::value == 15);
-}
+```{.cpp filename="compile-time-sum.cpp"}
+{{< include examples/20-template-metaprogramming/compile-time-sum.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-20-compile-time-sum]{aria-label="Open in Compiler Explorer"}
 
 ## Metafunction (types)
 
@@ -293,21 +255,11 @@ struct type_identity {
 struct Boo {};
 
 int main() {
+    static_assert(std::is_same_v<std::type_identity<Boo>::type, Boo>);
+}
 ```
 
-- static_assert(
-```cpp
-std::is_same < std::type_identity<Boo>::type,
-```
-
-- Boo
-```cpp
-       >::value
-   );
-       }
-```
-
-## Helper variable\types
+## Helper variables/types
 
 
 - Договоренности по именовании вспомогательных классов\переменных
@@ -321,16 +273,11 @@ template <typename T>
 using type_identity_t = typename std::type_identity<T>::type;
 
 int main() {
+    static_assert(std::is_same_v<std::type_identity_t<Boo>, Boo>);
+}
 ```
 
-- static_assert(
-```cpp
-       std::is_same_v<std::type_identity_t<Boo>, Boo>
-   );
-       }
-```
-
-## std::true_type\std::false_type
+## std::true_type/std::false_type
 
 
 ```cpp
@@ -339,13 +286,13 @@ struct integral_constant {
     static constexpr T value = Value;
     using value_type = T;
     using type = integral_constant;
-```
-
-- constexpr operator value_type() const noexcept { return value; }
-- constexpr value_type operator()() const noexcept { return value; }
-```cpp
-}
-;
+    constexpr operator value_type() const noexcept {
+        return value;
+    }
+    constexpr value_type operator()() const noexcept {
+        return value;
+    }
+};
 
 template <bool B>
 using bool_constant = integral_constant<bool, B>;
@@ -354,7 +301,7 @@ using true_type = integral_constant<bool, true>;
 using false_type = integral_constant<bool, true>;
 ```
 
-## std::true_type\std::false_type
+## std::true_type/std::false_type
 
 
 ```cpp
@@ -368,7 +315,7 @@ struct is_same<T, T> : std::true_type {};
 ## <type_traits>
 
 
-- Содержит набор метафункция для работы с типами
+- Содержит набор метафункций для работы с типами
 - <https://en.cppreference.com/w/cpp/header/type_traits>
 - Primary type categories
 - Composite type categories
@@ -446,7 +393,7 @@ int main() {
 }
 ```
 
-## Specialization Base on Traits
+## Specialization Based on Traits
 
 
 ```cpp
@@ -499,11 +446,11 @@ void print(const T& value) {
 
 
 - "Substitution Failure Is Not An Error"
-- Если для перегрузки функции невозможно вывести параметры шаблона (type deduction) и инстанциировть функцию, то это не приводит к ошибки компиляции. Такая перегрузка опускается (ill-formed)
+- Если при подстановке параметров шаблона возникает ошибка, такая перегрузка исключается из набора кандидатов
 - SFINAE работает только с перегрузками функций
-- SFINAE рассматривает только заголовки функция
+- SFINAE рассматривает только непосредственный контекст объявления функции
 - SFINAE отбрасывает только шаблонные функции
-- За счета SFINAE можно создавить условия, когда перегузка будет отбрасываться (well-formed)
+- С помощью SFINAE можно задавать условия, при которых перегрузка отбрасывается
 
 ## SFINAE
 
@@ -703,7 +650,7 @@ using conditional_t = conditional<b, T, U>::type;
 template <typename T, typename... TArgs>
 struct is_one_of : std::disjunction<std::is_same<T, TArgs>...> {};
 
-template <typenaуme T>
+template <typename T>
 struct is_one_of<T> : std::false_type {};
 
 int main() {
@@ -720,9 +667,7 @@ using void_t = void;
 ```
 
 - Корректен только если все параметры шаблона определимы
-```cpp
-Упрощает enable_if<>::type
-```
+- Упрощает использование `enable_if<>::type`
 
 ## is_class (naive)
 
@@ -743,10 +688,10 @@ int main() {
 }
 ```
 
-## Concepts (C++ 20)
+## Concepts (C++20)
 
 
-- Позволяют задавать ограничения для шаблонных параметров функций и классов в compile-time
+- Позволяют задавать проверяемые во время компиляции ограничения для параметров шаблона
 - Похожи на enable_if и  void_t, но имеют другую механику
 - Более нативны с точки зрения использования
 - concept
@@ -776,10 +721,7 @@ template <typename T, typename U>
 concept Addable = requires(T a, U b) { a + b; };
 
 template <typename T, typename U>
-```
-
-- requires Addable<T,U>
-```cpp
+    requires Addable<T, U>
 auto add(const T& a, const U& b) {
     return a + b;
 }
@@ -859,18 +801,11 @@ int main() {
 ```cpp
 template <typename... Args>
 concept Addable = requires(Args... args) {
-```
-
-- (args + ...);   // simple requirement
-```cpp
-}
-;
+    (args + ...);  // simple requirement
+};
 
 template <typename... Args>
-```
-
-- requires Addable<Args...>
-```cpp
+    requires Addable<Args...>
 auto add(Args&&... args) {
     return (args + ...);
 }
@@ -890,14 +825,10 @@ constexpr bool are_all_same = std::disjunction_v<std::is_same<T, TArgs>...>;
 
 template <typename... Args>
 concept Addable = requires(Args... args) {
-```
-
-- (args + ...);   // simple requirement
-```cpp
-requires sizeof...(Args) > 1;
-requires are_all_same<Args...>;
-}
-;
+    (args + ...);  // simple requirement
+    requires sizeof...(Args) > 1;
+    requires are_all_same<Args...>;
+};
 ```
 
 ## compound requirements
@@ -909,17 +840,11 @@ using first_arg_t = first_arg<Ts...>::type;
 
 template <typename... Args>
 concept Addable = requires(Args... args) {
-```
-
-- (args + ...);   // simple requirement
-```cpp
-requires sizeof...(Args) > 1;
-requires are_all_same<Args...>;
-{
-    (args + ...)
-} noexcept -> std::same_as<first_arg_t<Args...>>;
-}
-;
+    (args + ...);  // simple requirement
+    requires sizeof...(Args) > 1;
+    requires are_all_same<Args...>;
+    { (args + ...) } noexcept -> std::same_as<first_arg_t<Args...>>;
+};
 ```
 
 ## type requirements
@@ -931,15 +856,18 @@ using first_arg_t = first_arg<Ts...>::type;
 
 template <typename... Args>
 concept Addable = requires(Args... args) {
+    (args + ...);  // simple requirement
+    requires sizeof...(Args) > 1;
+    requires are_all_same<Args...>;
+    { (args + ...) } noexcept -> std::same_as<first_arg_t<Args...>>;
+};
 ```
 
-- (args + ...);   // simple requirement
-```cpp
-requires sizeof...(Args) > 1;
-requires are_all_same<Args...>;
-{
-    (args + ...)
-} noexcept -> std::same_as<first_arg_t<Args...>>;
-}
-;
-```
+[godbolt-20-naive-is-same]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'template+%3Ctypename+T,+typename+U%3E%0Astruct+is_same+%7B%0A++++static+constexpr+bool+value+%3D+false%3B%0A%7D%3B%0A%0Atemplate+%3Ctypename+T%3E%0Astruct+is_same%3CT,+T%3E+%7B%0A++++static+constexpr+bool+value+%3D+true%3B%0A%7D%3B%0A%0Aint+main()+%7B%0A++++static_assert(is_same%3Cint,+int%3E::value)%3B%0A++++static_assert(!!is_same%3Cint,+float%3E::value)%3B%0A++++static_assert(!!is_same%3Cint,+int%26%3E::value)%3B%0A++++static_assert(!!is_same%3Cconst+int,+int%3E::value)%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/20-template-metaprogramming/naive-is-same.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-20-value-identity]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'template+%3Cauto+Value%3E%0Astruct+value_identity+%7B%0A++++static+constexpr+auto+value+%3D+Value%3B%0A%7D%3B%0A%0Aint+main()+%7B%0A++++static_assert(value_identity%3C239%3E::value+%3D%3D+239)%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/20-template-metaprogramming/value-identity.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-20-compile-time-sum]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'template+%3Cauto...+Values%3E%0Astruct+sum+%7B%0A++++static+constexpr+auto+value+%3D+(Values+%2B+...)%3B%0A%7D%3B%0A%0Aint+main()+%7B%0A++++static_assert(sum%3C1,+2,+3,+4,+5%3E::value+%3D%3D+15)%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/20-template-metaprogramming/compile-time-sum.cpp" compiler="clang2310" options="-std=c++20 -O0" -->

@@ -6,8 +6,6 @@ title: "Лекция 21. Многопоточность"
 
 [Открыть слайды](slides/21-concurrency.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1Fc_-jBdbBDQFfX7lQNJSd-zDlk3r7P08mV5WQxWrDyE/edit)
-
 :::
 
 ## Язык С++
@@ -66,7 +64,7 @@ title: "Лекция 21. Многопоточность"
 <!-- embedded-images:end -->
 
 
-- Parallelism - физическое выполнение нескольких нескольких действий одновременно
+- Parallelism — физическое выполнение нескольких действий одновременно
 - Concurrency - выполнение двух или более задач одновременно
 - (с) Concurrency in Action
 
@@ -74,10 +72,10 @@ title: "Лекция 21. Многопоточность"
 
 
 ```cpp
-#include <thread>
 #include <iostream>
+#include <thread>
 
-int main(int argc, char** argv) {
+int main() {
     std::thread tr([]() { std::cout << "Hello World" << std::endl; });
     tr.join();
 
@@ -96,51 +94,28 @@ int main(int argc, char** argv) {
 
 
 - Каждый процесс содержит хотя бы один поток
-- Потоки шарят между собой общие ресурсы процесс (памят, файловые дескрипторы  и тд)
+- Потоки совместно используют ресурсы процесса: память, файловые дескрипторы и т. д.
 - У потоков общее виртуальное адресное пространство
 
 ## std::thread
 
 
-```cpp
-int main(int argc, char** argv) {
-    std::thread tr{[] { std::print("Hello from {0}\n", std::this_thread::get_id()); }};
-    tr.join();
-
-    return 0;
-}
+```{.cpp filename="basic-thread.cpp"}
+{{< include examples/21-concurrency/basic-thread.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-21-basic-thread]{aria-label="Open in Compiler Explorer"}
 
 - Класс стандартной библиотеки для запуска потоков
 
 ## std::thread
 
 
-```cpp
-int main(int argc, char** argv) {
-    using namespace std::chrono_literals;
-
-    for (int i = 0; i < 8; ++i) {
-        std::thread tr {
-            [] {
-           int i = 0;
-           std::print(
+```{.cpp filename="thread-stack-addresses.cpp"}
+{{< include examples/21-concurrency/thread-stack-addresses.cpp >}}
 ```
 
-- "Hello from {0}. i has address {1}\n",
-```cpp
- std::this_thread::get_id(), (void*)std::addressof(i)
-);
- }
- }
- ;
- tr.detach();
- }
- std::this_thread::sleep_for(1s);
-
- return 0;
- }
-```
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-21-thread-stack-addresses]{aria-label="Open in Compiler Explorer"}
 
 - Каждый поток имеет отдельный сегмент для стека
 
@@ -155,6 +130,12 @@ void sequential() {
     std::generate(values.begin(), values.end(), []() { return rand() % 100; });
 }
 ```
+
+[godbolt-21-basic-thread]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%23include+%3Cthread%3E%0A%0Aint+main()+%7B%0A++++std::thread+worker%7B%5B%5D+%7B+std::cout+%3C%3C+%22Hello+from+%22+%3C%3C+std::this_thread::get_id()+%3C%3C+!'%5Cn!'%3B+%7D%7D%3B%0A++++worker.join()%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0+-pthread',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/21-concurrency/basic-thread.cpp" compiler="clang2310" options="-std=c++20 -O0 -pthread" -->
+
+[godbolt-21-thread-stack-addresses]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Cfunctional%3E%0A%23include+%3Ciostream%3E%0A%23include+%3Cthread%3E%0A%23include+%3Cvector%3E%0A%0Aint+main()+%7B%0A++++std::vector%3Cstd::thread%3E+workers%3B%0A%0A++++for+(int+worker_index+%3D+0%3B+worker_index+%3C+8%3B+%2B%2Bworker_index)+%7B%0A++++++++workers.emplace_back(%5Bworker_index%5D+%7B%0A++++++++++++int+local_value+%3D+0%3B%0A++++++++++++std::cout+%3C%3C+%22Worker+%22+%3C%3C+worker_index+%3C%3C+%22,+thread+%22+%3C%3C+std::this_thread::get_id()%0A++++++++++++++++++++++%3C%3C+%22,+local+address+%22+%3C%3C+static_cast%3Cvoid*%3E(std::addressof(local_value))%0A++++++++++++++++++++++%3C%3C+!'%5Cn!'%3B%0A++++++++%7D)%3B%0A++++%7D%0A%0A++++for+(std::thread%26+worker+:+workers)+%7B%0A++++++++worker.join()%3B%0A++++%7D%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0+-pthread',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/21-concurrency/thread-stack-addresses.cpp" compiler="clang2310" options="-std=c++20 -O0 -pthread" -->
 
 ## std::thread
 
@@ -190,7 +171,7 @@ void execute(auto&& func) {
 
     const auto end = std::chrono::high_resolution_clock::now();
     const std::chrono::duration<double> diff = end - start;
-    std::cout << "durration = " << diff << std::endl;
+    std::cout << "duration = " << diff << std::endl;
 }
 
 int main(int argc, char** argv) {
@@ -201,7 +182,7 @@ int main(int argc, char** argv) {
 }
 ```
 
-- Почему ускорение меньше чем в 2 раза
+- Почему ускорение меньше, чем в два раза?
 
 ## Закон Амдала
 
@@ -259,7 +240,7 @@ void parallel(const std::vector<int>& data, size_t threadCount) {
 
 
 ```cpp
-std::mutex std::condition_variables
+std::mutex std::condition_variable
 ```
 
 - semaphores
@@ -268,7 +249,7 @@ std::mutex std::condition_variables
 ## std::mutex
 
 
-- позволяет защитить часть данных от одновременного обращение из разных потоков
+- Позволяет защитить данные от одновременного обращения из разных потоков
 - lock
 - try_lock
 - unlock
@@ -321,7 +302,7 @@ for (int t = 0; t < threadCount; ++t) {
 ## std::atomic
 
 
-- низкоуровневые инструкции процессор
+- Использует низкоуровневые инструкции процессора
 - хорошо подходит для простых операций (add, store,exchange)
 - не подходит для сложных синхронизаций
 - имеет полные и частичные специализации
@@ -379,76 +360,67 @@ class ThreadPool {
    public:
     ThreadPool(size_t threadCount) {
         for (int i = 0; i < threadCount; ++i) {
-```
+            threads_.emplace_back([this] {
+                while (true) {
+                    TTask task;
+                    {
+                        std::unique_lock<std::mutex> lock(mutex_);
+                        condition_.wait(lock, [this] { return !tasks_.empty() || stop_; });
 
-- threads_.emplace_back([this] {
-```cpp
-while (true) {
-    TTask task;
-    {
-        std::unique_lock<std::mutex> lock(mutex_);
-        condition_.wait(lock, [this] { return !tasks_.empty() || stop_; });
+                        if (stop_) return;
 
-        if (stop_) return;
+                        task = std::move(tasks_.front());
+                        tasks_.pop();
+                    }
 
-        task = std::move(tasks_.front());
-        tasks_.pop();
+                    task();
+                }
+            });
+        }
     }
 
-    task();
-}
-});
-}
-}
-
-~ThreadPool() {
-    Stop();
-}
-
-ThreadPool(const ThreadPool&) = delete;
-ThreadPool& operator=(const ThreadPool&) = delete;
-
-template <typename TFunc, typename... TArgs>
-void addTask(TFunc&& func, TArgs&&... args) {
-    {
-        TTask task = [func = std::forward<TFunc>(func), ... args = std::forward<TArgs>(args)]() {
-            std::invoke(func, args...);
-        };
-        std::unique_lock<std::mutex> lock(mutex_);
-        tasks_.push(std::move(task));
+    ~ThreadPool() {
+        Stop();
     }
 
-    condition_.notify_one();
-}
+    ThreadPool(const ThreadPool&) = delete;
+    ThreadPool& operator=(const ThreadPool&) = delete;
 
-void Stop() {
-    {
-        std::unique_lock<std::mutex> lock(mutex_);
-        stop_ = true;
+    template <typename TFunc, typename... TArgs>
+    void addTask(TFunc&& func, TArgs&&... args) {
+        {
+            TTask task = [func = std::forward<TFunc>(func),
+                          ... args = std::forward<TArgs>(args)]() { std::invoke(func, args...); };
+            std::unique_lock<std::mutex> lock(mutex_);
+            tasks_.push(std::move(task));
+        }
+
+        condition_.notify_one();
     }
 
-    condition_.notify_all();
-```
+    void Stop() {
+        {
+            std::unique_lock<std::mutex> lock(mutex_);
+            stop_ = true;
+        }
 
-- // Дождаться завершения всех потоков
-```cpp
-for (auto& thread : threads_) {
-    if (thread.joinable()) {
-        thread.join();
-    }
-}
-}
-;
+        condition_.notify_all();
+        // Дождаться завершения всех потоков
+        for (auto& thread : threads_) {
+            if (thread.joinable()) {
+                thread.join();
+            }
+        }
+    };
 
-private:
-std::vector<std::thread> threads_;
-std::queue<TTask> tasks_;
-mutable std::mutex mutex_;
-std::condition_variable condition_;
+   private:
+    std::vector<std::thread> threads_;
+    std::queue<TTask> tasks_;
+    mutable std::mutex mutex_;
+    std::condition_variable condition_;
 
-bool stop_ = false;
-}
-;
+    bool stop_ = false;
+};
 ```
 
 ## Thread Pool (I)
@@ -459,13 +431,15 @@ class ThreadPool {
     using TTask = std::function<void()>;
 
    public:
-    ThreadPool(size_t threadCount) {}
+    ThreadPool(size_t threadCount) {
+    }
 
     ThreadPool(const ThreadPool&) = delete;
     ThreadPool& operator=(const ThreadPool&) = delete;
 
     template <typename TFunc, typename... TArgs>
-    void addTask(TFunc&& func, TArgs&&... args) {}
+    void addTask(TFunc&& func, TArgs&&... args) {
+    }
 };
 ```
 
@@ -478,7 +452,8 @@ int main() {
     auto f = [](int n, int id) {
         auto thread_id = std::this_thread::get_id();
         for (int i = 0; i < n; ++i) {
-            std::println("Thread id {}, Task Id {}, value : {}", thread_id, id, i);
+            std::cout << "Thread id " << thread_id << ", task id " << id << ", value: " << i
+                      << '\n';
             std::this_thread::sleep_for(1s);
         }
     };
@@ -527,23 +502,20 @@ class ThreadPool {
 ```cpp
 ThreadPool(size_t threadCount) {
     for (int i = 0; i < threadCount; ++i) {
-```
-
-- threads_.emplace_back([this] {
-```cpp
-while (true) {
-    std::this_thread::sleep_for(1s);
-    TTask task;
-    {
-        std::lock_guard lock(mutex_);
-        if (tasks_.empty()) continue;
-        task = std::move(tasks_.front());
-        tasks_.pop();
+        threads_.emplace_back([this] {
+            while (true) {
+                std::this_thread::sleep_for(1s);
+                TTask task;
+                {
+                    std::lock_guard lock(mutex_);
+                    if (tasks_.empty()) continue;
+                    task = std::move(tasks_.front());
+                    tasks_.pop();
+                }
+                task();
+            }
+        });
     }
-    task();
-}
-});
-}
 }
 ```
 
@@ -570,7 +542,7 @@ class ThreadPool {
     std::queue<TTask> tasks_;
 ```
 
-- Поля класс - места потенциальных гонок
+- Поля класса — места потенциальных гонок
 
 ## Thread Pool (I)
 

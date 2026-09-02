@@ -6,8 +6,6 @@ title: "Лекция 10. Полиморфизм"
 
 [Открыть слайды](slides/10-oop-polymorphism.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1odZGZdK0veFKQc_q1g36AeSxNxTLJsLeO34_si9WrkU/edit)
-
 :::
 
 ## Язык С++
@@ -32,21 +30,18 @@ title: "Лекция 10. Полиморфизм"
 ```cpp
 class ILogger {
    public:
-    virtual void Log(const char* message) {}
+    virtual void Log(const char* message) {
+    }
 
     virtual ~ILogger() = default;
 };
 
 class CConsoleLogger : public ILogger {
    public:
-```
-
-- void Log(const char* message) override {
-```cpp
-std::cout << message << std::endl;
-}
-}
-;
+    void Log(const char* message) override {
+        std::cout << message << std::endl;
+    }
+};
 ```
 
 ## Виртуальные функции
@@ -55,40 +50,32 @@ std::cout << message << std::endl;
 ```cpp
 class CFileLogger : public ILogger {
    public:
-```
+    CFileLogger(const char* filename) : stream_(filename) {
+    }
 
-- CFileLogger(const char* filename)
-- : stream_(filename)
-```cpp
-{
-}
+    ~CFileLogger() {
+        stream_.close();
+    }
 
-~CFileLogger() {
-    stream_.close();
-}
+    CFileLogger(const CFileLogger&) = delete;
+    CFileLogger& operator=(const CFileLogger&) = delete;
+    void Log(const char* message) override {
+        stream_ << message << std::endl;
+    }
 
-CFileLogger(const CFileLogger&) = delete;
-CFileLogger& operator=(const CFileLogger&) = delete;
-```
-
-- void Log(const char* message) override {
-```cpp
-stream_ << message << std::endl;
-}
-
-private:
-std::ofstream stream_;
+   private:
+    std::ofstream stream_;
 }
 ```
 
 ## Таблица виртуальных функций
 
 
-- Таблица заводится для любого класс с виртуальной функции
+- Таблица обычно создаётся для класса с виртуальными функциями
 - Вызов виртуального метода — это вызов метода по адресу из таблицы
-- Стандарт не определяет механизм реализации виртуальных функций, однако большинство компиляторов реализуют именно таблицу вирутальных функций
+- Стандарт не определяет механизм реализации виртуальных функций, однако большинство компиляторов используют таблицу виртуальных функций
 
-## Слайд 7
+## Таблица виртуальных функций: схема
 
 <!-- embedded-images:start -->
 ![Изображение 1 со слайда 7](assets/10-oop-polymorphism/slide-07-image-01.jpg)
@@ -101,21 +88,18 @@ std::ofstream stream_;
 ```cpp
 class ILogger {
    public:
-    virtual void Log(const char* message) {}
+    virtual void Log(const char* message) {
+    }
 
     virtual ~ILogger() = default;
 };
 
 class CConsoleLogger : public ILogger {
    public:
-```
-
-- void Log(const char* message) override {
-```cpp
-std::cout << message << std::endl;
-}
-}
-;
+    void Log(const char* message) override {
+        std::cout << message << std::endl;
+    }
+};
 ```
 
 ## final
@@ -124,25 +108,17 @@ std::cout << message << std::endl;
 ```cpp
 class CConsoleLogger : public ILogger {
    public:
-```
-
-- void Log(const char* message) final {
-```cpp
-std::cout << message << std::endl;
-}
-}
-;
+    void Log(const char* message) final {
+        std::cout << message << std::endl;
+    }
+};
 
 class CModernConsoleLogger : public CConsoleLogger {
    public:
-```
-
-- void Log(const char* message) override {   // Compile-time error
-```cpp
-std::print("{0}", message);
-}
-}
-;
+    void Log(const char* message) override {  // Compile-time error
+        std::cout << message;
+    }
+};
 ```
 
 ## Virtual destructor
@@ -159,18 +135,18 @@ class Base {
     }
 };
 
-class Derrived : public Base {
+class Derived : public Base {
    public:
-    Derrived() {
-        std::cout << "Derrived\n";
+    Derived() {
+        std::cout << "Derived\n";
     }
-    ~Derrived() {
-        std::cout << "~Derrived\n";
+    ~Derived() {
+        std::cout << "~Derived\n";
     }
 };
 
 int main(int, char**) {
-    Base* d = new Derrived;
+    Base* d = new Derived;
     delete d;
 
     return 0;
@@ -188,17 +164,14 @@ class ILogger {
 };
 
 int main(int, char**) {
-```
-
-- ILogger log;  // Error : variable type 'ILogger' is an abstract class
-```cpp
-return 0;
+    ILogger log;  // Error : variable type 'ILogger' is an abstract class
+    return 0;
 }
 ```
 
-- класс экземпляр которого не может быть создан
-- обычно используется в качестве базового класса
-- содержит хотя бы 1 pure virtual function (чисто виртуальную функцию)
+- Класс, экземпляр которого нельзя создать
+- Обычно используется в качестве базового класса
+- Содержит хотя бы одну чисто виртуальную функцию (`pure virtual function`)
 
 ## Коллекции полиморфных объектов
 
@@ -229,14 +202,10 @@ class Base {
 
 class Derived : public Base {
    protected:
-```
-
-- void doWorkImpl() override {
-```cpp
-cout << "Doing work in Derived\n";
-}
-}
-;
+    void doWorkImpl() override {
+        cout << "Doing work in Derived\n";
+    }
+};
 ```
 
 ## Virtual Friend Function Idiom
@@ -264,10 +233,10 @@ std::ostream& operator<<(std::ostream& stream, const Base& value) {
 
 
 ```cpp
-class Derrived : public Base {
+class Derived : public Base {
    protected:
     void printImpl(std::ostream& stream) const override {
-        stream << "Derrived\n";
+        stream << "Derived\n";
     }
 };
 ```
@@ -276,7 +245,7 @@ class Derrived : public Base {
 
 
 - Лишнее обращение к таблице вместо явного адреса
-- Не возможно сделать inline optimization
+- Виртуальный вызов может затруднить инлайнинг
 - Для коллекций объектов - они всегда в куче
 - Порядок объектов также может влиять на скорость
 
@@ -286,4 +255,4 @@ class Derrived : public Base {
 - Абстракция
 - Инкапсуляция
 - Наследование
-- Полиформизм
+- Полиморфизм

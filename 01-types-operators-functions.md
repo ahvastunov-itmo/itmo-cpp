@@ -6,777 +6,808 @@ title: "Лекция 1. Типы, операторы и функции"
 
 [Открыть слайды](slides/01-types-operators-functions.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/13bW8SWoGPWDIA0dT_gbFFKHjeHFEfSQusTbYF7MpfCg/edit)
-
 :::
 
-## Язык С++
+## Язык C++
 
 
-- Типы данных, идентификаторы, операторы, операторы ветвления, циклы, функции
+- Типы данных и идентификаторы
+- Операторы и выражения
+- Ветвления и циклы
+- Функции
 
-## Hello world
+## Hello, world!
 
 
-```cpp
-#include <iostream>
-
-int main(int argc, char** argv) {
-    std::cout << "Hello, world!\n";
-
-    return 0;
-}
+```{.cpp filename="hello-world.cpp"}
+{{< include examples/01-types-operators-functions/hello-world.cpp >}}
 ```
 
-## Идентификаторы
-
-
-- Конструкции и элементы программы нужно как-то называть
-- Идентификаторы – это имена, используемые для обозначения переменных, типов, функций, шаблонов и т.д.
-- Идентификаторы могут являться частью выражений              				( например    c = a + b)
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-01-hello-world]{aria-label="Open in Compiler Explorer"}
 
 ## Идентификаторы
 
 
-- Буквы, цифры и “_”
-- Первый символ - буква или “_”
-- Прописные и строчные различаются
-- Не могут совпадать с ключевыми словами
+- Идентификаторы — имена переменных, типов, функций и других элементов программы
+- Используйте латинские буквы, цифры и `_`; имя не должно начинаться с цифры
+- Прописные и строчные буквы различаются: `value` и `Value` — разные имена
+- Имя не должно совпадать с ключевым словом C++
+- Не начинайте пользовательские имена с `_`: часть таких имён зарезервирована
+- Хорошее имя описывает назначение: `student_count`, а не `x1`
+
+```cpp
+result = left_operand + right_operand;
+```
 
 ## Code Style
 
 
-- Венгерская нотация
-- camelCase
-- snake_case
-- PascalCase
-- <https://google.github.io/styleguide/cppguide.html>
+Без единого стиля структуру программы трудно увидеть:
+
+```cpp
+int f(int a,int b){int x=0;for(int i=0;i<a;i++){if(i%2==0){x+=b;}else{x-=1;}}return x;}
+```
+
+На курсе используем:
+
+- `snake_case` для переменных и функций, `PascalCase` для типов
+- четыре пробела для отступа, фигурная скобка — на той же строке
+- фигурные скобки для ветвлений и циклов
+- `clang-format` и [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html)
 
 ## Встроенные типы данных
 
 
-- char
-- Целочисленные
-- int
-- short (int)
-- long (int)
-- С плавающей точкой
-- float
-- double
-- bool
-- void
-- nullptr_t
+- **Целочисленные:** `bool`, `char`, `short`, `int`, `long`, `long long`
+- **С плавающей точкой:** `float`, `double`, `long double`
+- **Специальные:** `void`, `std::nullptr_t`
+- Для символов также существуют `wchar_t`, `char8_t`, `char16_t`, `char32_t`
 
-## Модификаторы
+`char` — целочисленный тип, хотя обычно используется для хранения символов.
 
+::: {.notes}
+[Sources]
 
-- short
-- long
-- signed
-- unsigned
+- C++ working draft, *Fundamental types*: <https://eel.is/c++draft/basic.fundamental>
+- C++ working draft, *Pointer conversions and std::nullptr_t*: <https://eel.is/c++draft/conv.ptr>
 
-## Размеры и диапазоны для большинства 32-битных систем
+:::
 
-
-- Name | Size | Range
-- char | 1byte | signed: -128 to 127unsigned: 0 to 255
-- short | 2bytes | signed: -32768 to 32767unsigned: 0 to 65535
-- int | 4bytes | signed: -2147483648 to 2147483647unsigned: 0 to 4294967295
-- long | 4bytes | signed: -2147483648 to 2147483647unsigned: 0 to 4294967295
-- float | 4bytes | +/- 3.4e +/- 38 (~7 digits)
-- double | 8bytes | +/- 1.7e +/- 308 (~15 digits)
-- long double | 8bytes | +/- 1.7e +/- 308 (~15 digits)
-
-## numeric_limits
+## Модификаторы целочисленных типов
 
 
 ```cpp
-#include <iostream>
-#include <limits>
+short int small_value = -10;
+long int large_value = 1'000'000L;
+long long very_large_value = 9'000'000'000LL;
 
-int main(int argc, char** argv) {
-    std::cout << "Max value: " << std::numeric_limits<long>().max() << std::endl;
-    std::cout << "Min value: " << std::numeric_limits<double>().min() << std::endl;
-    std::cout << "Is signed value: " << std::numeric_limits<char>().is_signed << std::endl;
-
-    return 0;
-}
+signed int temperature = -20;
+unsigned int student_count = 30U;
+unsigned long file_size = 4'000'000UL;
 ```
 
-## Целочисленные типы
+- `signed` разрешает отрицательные значения
+- `unsigned` хранит только неотрицательные значения
+- `short` и `long` меняют минимально гарантированный диапазон типа
+- Слово `int` обычно можно опустить: `unsigned` означает `unsigned int`
 
+## Размеры типов зависят от платформы
+
+
+Пример для Linux x86-64 с ABI LP64:
+
+| Тип | Размер |
+|---|---:|
+| `char` | 1 байт |
+| `short` | 2 байта |
+| `int` | 4 байта |
+| `long` | 8 байт |
+| `long long` | 8 байт |
+| `float` | 4 байта |
+| `double` | 8 байт |
+
+На другой архитектуре, в другой ОС или у другого компилятора размеры могут отличаться. Всегда верно только `sizeof(char) == 1`.
+
+::: {.notes}
+[Sources]
+
+- C++ working draft, *Fundamental types*: <https://eel.is/c++draft/basic.fundamental>
+- System V ABI, *AMD64 Architecture Processor Supplement*: <https://gitlab.com/x86-psABIs/x86-64-ABI>
+
+:::
+
+## Как узнать размер типа
+
+
+```{.cpp filename="type-sizes.cpp"}
+{{< include examples/01-types-operators-functions/type-sizes.cpp >}}
+```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-01-type-sizes]{aria-label="Open in Compiler Explorer"}
+
+`sizeof` возвращает размер в байтах платформы и имеет тип `std::size_t`.
+
+
+
+## Диапазоны типов: `numeric_limits`
+
+
+```{.cpp filename="numeric-limits.cpp"}
+{{< include examples/01-types-operators-functions/numeric-limits.cpp >}}
+```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-01-numeric-limits]{aria-label="Open in Compiler Explorer"}
+
+- `lowest()` — наименьшее конечное значение
+- `max()` — наибольшее конечное значение
+- Для `double` функция `min()` возвращает наименьшее **положительное нормализованное** значение
+
+
+
+::: {.notes}
+[Sources]
+
+- C++ working draft, *Class template numeric_limits*: <https://eel.is/c++draft/numeric.limits>
+
+:::
+
+## Типы с явно заданной шириной
+
+
+Заголовочный файл `<cstdint>` объявляет типы:
 
 ```cpp
-#include <cstdint>
+std::int8_t   std::uint8_t
+std::int16_t  std::uint16_t
+std::int32_t  std::uint32_t
+std::int64_t  std::uint64_t
 ```
 
-- int8_t, int16_t,int32_t, int64_t
-- uint8_t, uint16_t, uint32_t, uint64_t
-- 1 == sizeof(char) <= sizeof(short) <= sizeof(int) <= sizeof(long) <= sizeof(long long)
+- Число в имени — ширина типа в битах
+- Используйте такие типы, когда размер является частью контракта: формат файла, протокол, регистр устройства
+- Тип точной ширины доступен, только если платформа умеет его предоставить
+- Для обычных счётчиков и вычислений часто достаточно `int`
 
 ## Целочисленные литералы
 
 
-```cpp
-#include <iostream>
-
-int main(int argc, char** argv) {
-    int a = 162;
-    int b = 0242;         // OCT
-    int c = 0xA2;         // HEX
-    int d = 0b010100010;  // BIN
-
-    std::cout << "a = " << a << std::endl
-              << "b = " << b << std::endl
-              << "c = " << c << std::endl
-              << "d = " << d << std::endl;
-    return 0;
-}
+```{.cpp filename="integer-literals.cpp"}
+{{< include examples/01-types-operators-functions/integer-literals.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-01-integer-literals]{aria-label="Open in Compiler Explorer"}
+
+- `0` — восьмеричный префикс, `0x` — шестнадцатеричный, `0b` — двоичный
+- Апостроф разделяет разряды и не меняет значение
+- Суффиксы: `U` — `unsigned`, `L` — `long`, `LL` — `long long`
+
+
 
 ## Вещественные литералы
 
 
-```cpp
-#include <iostream>
-
-int main(int argc, char** argv) {
-    double a = 0.15;
-    float b = 0.15f;
-    long double c = 15e-2l;
-    float d = 15e-2f;
-
-    std::cout << "a = " << a << std::endl
-              << "b = " << b << std::endl
-              << "c = " << c << std::endl
-              << "d = " << d << std::endl;
-    return 0;
-}
+```{.cpp filename="floating-point-literals.cpp"}
+{{< include examples/01-types-operators-functions/floating-point-literals.cpp >}}
 ```
 
-## Представление чисел в памяти
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-01-floating-literals]{aria-label="Open in Compiler Explorer"}
+
+- Без суффикса литерал имеет тип `double`
+- `F` задаёт `float`, `L` — `long double`
+- Запись `1.5E6` означает $1{,}5 \cdot 10^6$
+- Не все десятичные дроби представимы в двоичном виде точно
 
 
-- Целые числа
-- Прямой код
-- Обратный код
-- Дополнительный код
-- Вещественные
-- Знак, порядок, мантисса
+
+## Зачем нужен дополнительный код
+
+
+Для восьми бит:
+
+```text
+ 5 = 0000 0101
+-5 = 1111 1011  ← инвертировать биты 5 и прибавить 1
+```
+
+- Сложение работает одной и той же схемой для положительных и отрицательных чисел
+- Для нуля существует единственное представление
+- Отрицание значения `x` соответствует вычислению $2^N - x$
+- В C++20 знаковые целые используют представление дополнительным кодом
+
+```text
+  0000 0101
++ 1111 1011
+------------
+1 0000 0000  → младшие восемь бит равны нулю
+```
+
+Переполнение знакового целого в C++ всё равно не определено.
+
+::: {.notes}
+[Sources]
+
+- WG21 P0907R4, *Signed Integers are Two's Complement*: <https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0907r4.html>
+- C++ working draft, *Fundamental types*: <https://eel.is/c++draft/basic.fundamental>
+
+:::
 
 ## Символьные литералы
 
 
-- Символьный литерал - ‘x’
-- Некоторые символьные литералы начинаются с эскейп-последовательности ‘\n’
-- символ новой строки  ‘\n’
-- горизонтальная табуляция ‘\t’
-- обратная слеш ‘\\’
-- одиночная кавычка ‘\‘’
-- Строковый литерал “Hello \’ world\’\n”
+Символьный литерал записывается в одинарных кавычках:
 
-## Слайд 15
+```cpp
+char letter = 'x';
+char newline = '\n';        // новая строка
+char tab = '\t';            // горизонтальная табуляция
+char backslash = '\\';      // обратная косая черта
+char single_quote = '\'';   // одинарная кавычка
+```
 
-<!-- embedded-images:start -->
-![Изображение 1 со слайда 15](assets/01-types-operators-functions/slide-15-image-01.png)
-<!-- embedded-images:end -->
-
+Экранирующая последовательность начинается с обратной косой черты `\`.
 
 ## Строковые литералы
 
 
-- Строка - массив символов
-- В конце спец символ конца строки ‘\0’
+```cpp
+const char message[] = "Hello, world!\n";
+const char quote[] = "He said: \"Hello!\"";
+```
 
-## bool
+- Строковый литерал — массив символов
+- Последний элемент массива — нулевой символ `\0`
+- `\0` отмечает конец строки, но не печатается
+- Символы строкового литерала изменять нельзя
+
+## `bool`: логический тип
 
 
-- true
-- false
+- `true` — истина
+- `false` — ложь
 
-## Enum (перечислимый тип)
+Значения `bool` используются в условиях и являются результатом сравнений:
+
+```cpp
+bool is_positive = value > 0;
+```
+
+## `enum class`: перечислимый тип
 
 
 ```cpp
-enum Color {
+enum class Color {
+    red,
+    green,
+    blue,
+};
+
+Color color = Color::blue;
 ```
 
-- RED,
-- GREEN,
-- BLUE
-```cpp
-}
-;
+Перечисление задаёт ограниченный набор именованных значений. `enum class` неявно не преобразуется в целое число.
 
-Color color = Color::BLUE;
-```
-
-## Объявление переменных (declaration)
+## Объявление и определение переменных
 
 
-```cpp
-int a;
-float b;
-char c;
-
-int k, l, n;
-
-unsigned short s;
-signed int i;
-```
-
-## Определение переменных (definition)
-
+Объявление сообщает компилятору имя и тип. Определение также создаёт объект:
 
 ```cpp
-int a = 0;
-double r = 1.23;
-float b = 23.5f;
-float c = 1.0e-3;
-char ch = 'c';
-long l = 23456789L;
-int i = 0X1F;
-long double ld = 1.2345l;
+extern int global_count;  // объявление, но не определение
+
+int global_count = 0;     // определение
+double radius = 1.23;     // определение
+char grade = 'A';         // определение
 ```
+
+Каждое определение является объявлением, но не каждое объявление является определением.
+
+::: {.notes}
+[Sources]
+
+- C++ working draft, *Declarations and definitions*: <https://eel.is/c++draft/basic.def>
+
+:::
 
 ## Операторы
 
 
-- Арифметические (+, -, *, /, %)
-- Сравнение (>, >=, <, <=, ==, !=)
-- Логические (&&, ||)
-- Инкремента и Декремента (++, --)
-- Побитовые (&, |, ^,  <<, >>,  ~)
-- Присваивание (=, +=, *=, )
-- Условный (?:)
-- Специальные (sizeof, static_cast, …)
+- Арифметические: `+`, `-`, `*`, `/`, `%`
+- Сравнение: `>`, `>=`, `<`, `<=`, `==`, `!=`
+- Логические: `&&`, `||`, `!`
+- Инкремент и декремент: `++`, `--`
+- Побитовые: `&`, `|`, `^`, `<<`, `>>`, `~`
+- Присваивание: `=`, `+=`, `-=`, `*=`, `/=`, `%=`
+- Условный: `?:`
+- Другие: `sizeof`, `static_cast`, …
 
 ## Преобразования типов
 
 
-- Неявные преобразования
-- Если какой-либо из операндов принадлежит типу long double, то и другой приводится к long double.
-- В противном случае, если какой-либо из операндов принадлежит типу double, то и другой приводится к double.
-- В противном случае, если какой-либо из операндов принадлежит типу float, то и другой приводится к float.
-- В противном случае операнды типов char и short приводятся к int.
-- И наконец, если один из операндов типа long, то и другой приводится к long.
-- Явное преобразование (c-style cast) (тип) переменная
+- Компилятор выполняет неявные преобразования операндов к общему типу
+- `char` и `short` обычно сначала преобразуются в `int`
+- При смешивании целых и вещественных типов результат обычно становится вещественным
+- Смешивание знаковых и беззнаковых типов требует особой осторожности
+- Явное преобразование записываем через `static_cast`
 
-## sizeof
+```cpp
+double value = 3.75;
+int integer_part = static_cast<int>(value);  // 3
+```
+
+## `sizeof`
+
+
+Оператор `sizeof` применим к типу или выражению:
+
+```cpp
+sizeof(int)
+sizeof(double)
+sizeof(variable)
+```
+
+- Результат имеет тип `std::size_t`
+- `sizeof(char)` всегда равен `1`
+- Количество бит в байте доступно как `CHAR_BIT` из `<climits>`
+
+Полная программа приведена на слайде «Как узнать размер типа».
+
+## Основные уровни приоритета
+
+
+| Выше | Операторы |
+|---|---|
+| Постфиксные | `a[k]`, `f()`, `.`, `->`, `a++`, `a--` |
+| Унарные | `++a`, `--a`, `!`, `~`, `+`, `-`, `*`, `&`, `sizeof` |
+| Умножение | `*`, `/`, `%` |
+| Сложение | `+`, `-` |
+| Сдвиги | `<<`, `>>` |
+| Сравнение | `<`, `<=`, `>`, `>=`, `==`, `!=` |
+
+## Остальные уровни приоритета
+
+
+| Выше | Операторы |
+|---|---|
+| Побитовые | `&`, `^`, `|` |
+| Логические | `&&`, `||` |
+| Условный | `?:` |
+| Присваивание | `=`, `+=`, `-=`, `*=`, `/=`, … |
+| Ниже | `,` |
+
+Приоритет не задаёт порядок вычисления операндов. Если выражение трудно прочитать — добавьте скобки.
+
+## Как читается выражение?
 
 
 ```cpp
-int x;
-printf("sizeof(int) = %zu\n", sizeof(int));
-printf("sizeof(float) = %zu\n", sizeof(float));
-printf("sizeof(char) = %zu\n", sizeof(char));
-printf("sizeof(long long) = %zu\n", sizeof(long long));
-
-printf("sizeof(x) = %zu\n", sizeof(x));
+a + b * c << d || 25 != 32 && !c++
 ```
 
-## a[k] | индексы | 16 | слева направо
+С учётом приоритета:
 
-- f(…) | вызов функции | 16 | слева направо
-- . | прямой выбор | 16 | слева направо
 ```cpp
-->| опосредованный выбор | 16 | слева направо
+((a + (b * c)) << d) || ((25 != 32) && (!(c++)))
 ```
 
-- ++ -- | положительное и отрицательное приращение | 16 | слева направо
-- ++ -- | положительное и отрицательное приращение | 15 | справа налево
-- sizeof | размер | 15 | справа налево
-- ~ | побитовое НЕ | 15 | справа налево
-- ! | логическое НЕ | 15 | справа налево
-- + | изменение знака, плюс | 15 | справа налево
-- & | адрес | 15 | справа налево
+В рабочем коде лучше сразу поставить скобки или разбить вычисление на несколько выражений.
 
-## * | опосредование (разыменование) | 15 | справа налево
+## Оператор и инструкция
 
 
-- ( имя типа ) | приведение типа | 14 | справа налево
-- * / % | мультипликативные операции | 13 | слева направо
-- + - | аддитивные операции | 12 | слева направо
-- << >> | сдвиг влево и вправо | 11 | слева направо
-- < > <= >= | отношения | 10 | слева направо
-- == != | равенство/неравенство | 9 | слева направо
-- & | побитовое И | 8 | слева направо
-- ^ | побитовое исключающее ИЛИ | 7 | слева направо
-- | | побитовое ИЛИ | 6 | слева направо
-- && | логическое И | 5 | слева направо
-- || | логическое ИЛИ | 4 | слева направо
-- ? : | условие | 3 | справа налево
-- = += -= *= /= %= <<= >>= &= ^= |= | присваивание | 2 | справа налево
-- , | последовательная оценка | 1 | слева направо
+Операторы входят в выражения:
 
-## a + b * c << d || 25 != 32 && !c++
-
-
-## Оператор
-
-
-- Оператор заканчивается «;»
 ```cpp
 c = a + b;
-printf(“Hello World”);
 i++;
-{
-    оператор1;
-    оператор2;
-    оператор3;
-}
- - составной оператор
 ```
 
-## if-else
+Инструкция-выражение обычно заканчивается `;`. Несколько инструкций можно объединить в блок:
 
-
-```cpp
-if (выражение) оператор1(или составной оператор);
-```
-
-- else
-```cpp
-оператор2(или составной оператор);
-```
-
-- else-часть может отсутствовать
-```cpp
-if (выражение != 0) тоже самое что if (выражение)
-```
-
-## if-else
-
-
-```cpp
-// n == -2, a = 1, b = 2, z = 20;
-if (n > 0)
-    if (a > b) z = a;
-```
-
-- else
-```cpp
-z = b;
-
-// n == -2, a = 1, b = 2, z = 20;
-if (n > 0)
-    if (a > b) z = a;
-```
-
-- else
-```cpp
-z = b;
-```
-
-## if-else
-
-
-```cpp
-// n == -2, a = 1, b = 2, z = 20;
-if (n > 0) {
-    if (a > b) {
-        z = a;
-    }
-}
-```
-
-- else {
-```cpp
-z = b;
-}
-
-// n == -2, a = 1, b = 2, z = 20;
-if (n > 0) {
-    if (a > b) {
-        z = a;
-    }
-```
-
-- else {
-```cpp
-z = b;
-}
-}
-```
-
-## else-if
-
-
-```cpp
-if (выражение1) оператор1;
-```
-
-- else if(выражение2)
-```cpp
-оператор2;
-```
-
-- else if(выражение3)
-```cpp
-оператор3;
-```
-
-- else if(выражение4)
-```cpp
-оператор4;
-```
-
-- else
-```cpp
-оператор5;
-```
-
-## Цикл while
-
-
-```cpp
-while (выражение) 
-```
-
-- оператор
-```cpp
-int a;
-std::cin >> a;
-
-while (a > 0) {
-    std::cout << a << std::endl;
-    --a;
-}
-```
-
-## Цикл do-while
-
-
-- do
-```cpp
-оператор;
-while (выражение);
-
-unsigned long n;
-```
-
-- do
 ```cpp
 {
+    print_message();
+    ++message_count;
+}
+```
+
+## Условный оператор `if-else`
+
+
+```cpp
+if (condition) {
+    statement_when_true();
+} else {
+    statement_when_false();
+}
+```
+
+- Ветвь `else` может отсутствовать
+- Числовое значение `0` в условии означает `false`, ненулевое — `true`
+- На курсе всегда используем фигурные скобки
+
+## К какому `if` относится `else`?
+
+
+Без фигурных скобок `else` относится к ближайшему незакрытому `if`:
+
+```cpp
+if (number > 0)
+    if (left > right)
+        result = left;
+    else
+        result = right;
+```
+
+Отступы не меняют синтаксис программы.
+
+## Фигурные скобки устраняют неоднозначность
+
+
+```cpp
+if (number > 0) {
+    if (left > right) {
+        result = left;
+    }
+} else {
+    result = right;
+}
+```
+
+Теперь `else` явно относится к внешнему `if`.
+
+## Цепочка `else if`
+
+
+```cpp
+if (score >= 90) {
+    grade = 'A';
+} else if (score >= 75) {
+    grade = 'B';
+} else if (score >= 60) {
+    grade = 'C';
+} else {
+    grade = 'F';
+}
+```
+
+Проверки выполняются сверху вниз до первой подходящей ветви.
+
+## Цикл `while`
+
+
+```cpp
+int number = 5;
+
+while (number > 0) {
+    std::cout << number << '\n';
+    --number;
+}
+```
+
+Условие проверяется **до** каждой итерации. Цикл может не выполниться ни разу.
+
+## Цикл `do-while`
+
+
+```cpp
+unsigned long number = 0;
+
+do {
     std::cout << "Enter number (0 to end): ";
-    std::cin >> n;
-    std::cout << "You entered: " << n << std::endl;
-}
-while (n != 0);
+    std::cin >> number;
+    std::cout << "You entered: " << number << '\n';
+} while (number != 0);
 ```
 
-## Цикл for
+Условие проверяется **после** итерации. Тело выполнится хотя бы один раз.
+
+## Цикл `for`
 
 
 ```cpp
-выр1;
-while (выр2) {
-```
-
-- оператор
-```cpp
-выр3;
-}
-
-for (выр1; выр2; выр3) 
-```
-
-- оператор
-
-## Цикл for
-
-
-```cpp
-for (инициализация; условие; инкремент) оператор;
-
-for (int n = 10; n > 0; n--) {
-    std::cout << n << ", ";
-}
-
-int i;
-for (int n = 0, i = 100; n != i; n++, i--) {
-    std::cout << n << ", ";
+for (initialization; condition; step) {
+    statement();
 }
 ```
 
-## Цикл range for
+Приблизительный эквивалент:
+
+```cpp
+initialization;
+while (condition) {
+    statement();
+    step;
+}
+```
+
+При наличии `continue` эти формы могут вести себя по-разному.
+
+## Примеры `for`
 
 
 ```cpp
-for (объявление : диапазон) оператор;
+for (int number = 10; number > 0; --number) {
+    std::cout << number << ", ";
+}
 
-for (int n : {0, 1, 2, 3, 4, 5}) {
-    std::cout << n << ' ';
+for (int left = 0, right = 100; left != right; ++left, --right) {
+    std::cout << left << ", ";
+}
+```
+
+Инициализация, условие и шаг собраны в заголовке цикла.
+
+## Range-based `for`
+
+
+```cpp
+int values[] = {0, 1, 2, 3, 4, 5};
+
+for (int value : values) {
+    std::cout << value << ' ';
 }
 std::cout << '\n';
 ```
 
-## Операторы break, continue
+Цикл последовательно перебирает все элементы диапазона.
+
+## Оператор `break`
 
 
 ```cpp
-for (int n = 10; n > 0; n--) {
-    std::cout << n << ", ";
-    if (n == 3) {
-        std::cout << "countdown aborted!";
+for (int number = 10; number > 0; --number) {
+    if (number == 3) {
+        std::cout << "countdown aborted!\n";
         break;
     }
+
+    std::cout << number << ", ";
 }
 ```
 
-## Операторы break, continue
+`break` немедленно завершает ближайший цикл или `switch`.
+
+## Оператор `continue`
 
 
 ```cpp
-for (int n = 10; n > 0; n--) {
-    if (n == 5) continue;
-    std::cout << n << ", ";
+for (int number = 10; number > 0; --number) {
+    if (number == 5) {
+        continue;
+    }
+
+    std::cout << number << ", ";
 }
 ```
 
-## Оператор switch
+`continue` пропускает остаток текущей итерации.
+
+## Оператор `switch`
 
 
 ```cpp
-switch (выражение) {
-    case константа1:
-        группа оператор1;
-        break;
-    case constant2:
-        группа оператор2;
-        break;
-```
-
-- . . .
-- default:
-```cpp
-группа оператор по умолчанию;
-}
-```
-
-## Оператор switch
-
-
-- Константы – целые
-- Вычисления начинаются с первой совпавшей с константой в  ветке и выражения
-- Все константы должны быть разные
-- Если совпадения не нашлось то выполняется default
-- Break вызывает выход из switch
-- Сквозное выполнение
-
-## Оператор switch
-
-
-```cpp
-switch (x) {
+switch (value) {
     case 1:
-        printf("x is 1");
+        handle_one();
         break;
     case 2:
-        printf("x is 2");
+        handle_two();
         break;
-```
-
-- default:
-```cpp
-printf("unknown");
-}
-
-if (x == 1) {
-    printf("x is 1");
-} else if (x == 2) {
-    printf("x is 2");
+    default:
+        handle_other();
+        break;
 }
 ```
 
-- else {
+## Как работает `switch`
+
+
+- Выражение должно иметь целочисленный или перечислимый тип
+- Метки `case` должны быть различными константными выражениями
+- Выполнение начинается с совпавшей метки
+- Если совпадения нет, управление переходит в `default`
+- `break` завершает `switch`
+- Без `break` выполнение переходит в следующую ветвь
+
+## `switch` и `if-else`
+
+
 ```cpp
-printf("unknown");
+switch (value) {
+    case 1:
+        std::cout << "value is 1\n";
+        break;
+    case 2:
+        std::cout << "value is 2\n";
+        break;
+    default:
+        std::cout << "unknown value\n";
+        break;
 }
 ```
 
-## Оператор switch
+`switch` удобен, когда одно значение сравнивается с несколькими константами.
+
+## Группировка ветвей `switch`
 
 
 ```cpp
-switch (x) {
+switch (value) {
     case 1:
     case 2:
     case 3:
-        printf("x is 1, 2 or 3");
+        std::cout << "value is 1, 2 or 3\n";
         break;
-```
-
-- default:
-```cpp
-printf("x is not 1, 2, 3");
+    default:
+        std::cout << "another value\n";
+        break;
 }
 ```
 
-## Функции
-
-
-- тип имя(параметр1, параметр2) {
-- объявления и инструкции
-```cpp
-}
-```
+Несколько меток могут вести к одному блоку инструкций.
 
 ## Функции
 
 
 ```cpp
-int addition(int a, int b) {
-    int result;
-    result = a + b;
+return_type function_name(parameter_type parameter) {
+    statements();
     return result;
 }
-
-int main() {
-    int z;
-    z = addition(5, 3);
-    return 0;
-}
 ```
 
-## Функции. declarations & definitions
+- Параметры доступны внутри тела функции
+- `return` завершает функцию и возвращает результат
+- Тип результата должен соответствовать объявленному возвращаемому типу
+
+## Вызов функции
 
 
-- int max(int a, int b); // declaration
-```cpp
-int main() {
-    int c = max(10, 2);  // ok
+```{.cpp filename="addition-function.cpp"}
+{{< include examples/01-types-operators-functions/addition-function.cpp >}}
 ```
 
-- max(1);              // compile-time error
-```cpp
-return 0;
-}
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-01-addition-function]{aria-label="Open in Compiler Explorer"}
 
-int max(int a, int b) {  // definition
-    return a > b ? a : b;
-}
+## Объявление и определение функции
+
+
+```{.cpp filename="function-declaration-definition.cpp"}
+{{< include examples/01-types-operators-functions/function-declaration-definition.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-01-function-declaration]{aria-label="Open in Compiler Explorer"}
+
+- Объявление сообщает сигнатуру функции
+- Определение содержит тело функции
+
+
 
 ## Функция без возвращаемого значения
 
 
-```cpp
-#include <iostream>
-
-void printmessage() {
-    std::cout << "I'm a function!\n";
-}
-
-int main() {
-    printmessage();
-    return 0;
-}
+```{.cpp filename="void-function.cpp"}
+{{< include examples/01-types-operators-functions/void-function.cpp >}}
 ```
 
-- Нет возвращаемого значения
-- Объявление и определение в одном месте
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-01-void-function]{aria-label="Open in Compiler Explorer"}
 
-## main
+Тип `void` означает, что функция не возвращает значение.
 
+
+
+## Функция `main`
+
+
+Стандартные формы:
 
 ```cpp
-int main(void) {
-    …
+int main() {
+    // ...
 }
 
 int main(int argc, char* argv[]) {
-    ...
+    // ...
 }
 ```
 
-- int main (int argc, char *argv[] , other_parameters )
-```cpp
-{
-    ...
-}
+- Достижение конца `main` эквивалентно `return 0;`
+- `EXIT_SUCCESS` и `EXIT_FAILURE` объявлены в `<cstdlib>`
+- Дополнительные параметры `main` могут зависеть от реализации
+
+## Аргументы командной строки
+
+
+```{.cpp filename="command-line-arguments.cpp"}
+{{< include examples/01-types-operators-functions/command-line-arguments.cpp >}}
 ```
 
-- EXIT_SUCESS, EXIT_FAILURE
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-01-command-line-arguments]{aria-label="Open in Compiler Explorer"}
 
-## main
+- `argc` — количество аргументов
+- `argv` — массив указателей на строки с аргументами
+- `argv[argc] == nullptr`
 
 
-```cpp
-#include <iostream>
 
-int main(int argc, char* argv[]) {
-    for (int i = 0; i < argc; ++i) std::cout << argv[i] << " ";
+::: {.notes}
+[Sources]
 
-    return 0;
-}
+- C++ working draft, *Main function*: <https://eel.is/c++draft/basic.start.main>
+
+:::
+
+## Рекурсивная функция
+
+
+```{.cpp filename="factorial-recursive.cpp"}
+{{< include examples/01-types-operators-functions/factorial-recursive.cpp >}}
 ```
 
-- argc - размер массива
-- argv - массив строк
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-01-factorial-recursive]{aria-label="Open in Compiler Explorer"}
 
-## Рекурсия
+Функция вызывает сама себя с меньшим аргументом. Условие `number == 0` останавливает рекурсию.
 
 
-```cpp
-#include <iostream>
 
-unsigned long long factorial(unsigned int n) {
-    if (n == 0)
-        return 1;
-    else
-        return n * factorial(n - 1);
-}
+## Итеративная версия
 
-int main() {
-    std::cout << factorial(5) << std::endl;
 
-    return 0;
-}
+```{.cpp filename="factorial-iterative.cpp"}
+{{< include examples/01-types-operators-functions/factorial-iterative.cpp >}}
 ```
 
-## Рекурсия
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-01-factorial-iterative]{aria-label="Open in Compiler Explorer"}
+
+Обе версии вычисляют одно значение, но цикл не создаёт цепочку рекурсивных вызовов.
 
 
-```cpp
-#include <iostream>
 
-unsigned long long factorial(unsigned int n) {
-    unsigned long long result = 1;
-    for (int i = 2; i <= n; ++i) {
-        result *= i;
-    }
-    return result;
-}
+## Сокрытие имён (shadowing)
 
-int main() {
-    std::cout << factorial(5) << std::endl;
 
-    return 0;
-}
+```{.cpp filename="name-shadowing.cpp" code-line-numbers="|3-4|6-9|15-18|21"}
+{{< include examples/01-types-operators-functions/name-shadowing.cpp >}}
 ```
 
-## «Затемнение» внешних переменных
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-01-name-shadowing]{aria-label="Open in Compiler Explorer"}
+
+Внутреннее объявление временно скрывает одноимённую переменную из внешней области видимости.
 
 
-```cpp
-#include <iostream>
 
-int x;
-int y;
-void func(double x) {
-    double y;
-    std::cout << "x = " << x << " y = " << y << std::endl;
-}
-int main() {
-    x = 21;
-    {
-        int x = 10;
-        y = 239;
-        std::cout << "x = " << x << " y = " << y << std::endl;
-        func(y);
-    }
-    std::cout << "x = " << x << " y = " << y << std::endl;
-    return 0;
-}
-```
+[godbolt-01-hello-world]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Aint+main()+%7B%0A++++std::cout+%3C%3C+%22Hello,+world!!%5Cn%22%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/01-types-operators-functions/hello-world.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-01-type-sizes]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ccstdint%3E%0A%23include+%3Ciostream%3E%0A%0Aint+main()+%7B%0A++++std::cout+%3C%3C+%22sizeof(char)+%3D+%22+%3C%3C+sizeof(char)+%3C%3C+!'%5Cn!'%3B%0A++++std::cout+%3C%3C+%22sizeof(short)+%3D+%22+%3C%3C+sizeof(short)+%3C%3C+!'%5Cn!'%3B%0A++++std::cout+%3C%3C+%22sizeof(int)+%3D+%22+%3C%3C+sizeof(int)+%3C%3C+!'%5Cn!'%3B%0A++++std::cout+%3C%3C+%22sizeof(long)+%3D+%22+%3C%3C+sizeof(long)+%3C%3C+!'%5Cn!'%3B%0A++++std::cout+%3C%3C+%22sizeof(long+long)+%3D+%22+%3C%3C+sizeof(long+long)+%3C%3C+!'%5Cn!'%3B%0A++++std::cout+%3C%3C+%22sizeof(std::int32_t)+%3D+%22+%3C%3C+sizeof(std::int32_t)+%3C%3C+!'%5Cn!'%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/01-types-operators-functions/type-sizes.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-01-numeric-limits]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%23include+%3Climits%3E%0A%0Aint+main()+%7B%0A++++std::cout+%3C%3C+%22long:+%5B%22+%3C%3C+std::numeric_limits%3Clong%3E::lowest()+%3C%3C+%22,+%22%0A++++++++++++++%3C%3C+std::numeric_limits%3Clong%3E::max()+%3C%3C+%22%5D%5Cn%22%3B%0A++++std::cout+%3C%3C+%22double:+%5B%22+%3C%3C+std::numeric_limits%3Cdouble%3E::lowest()+%3C%3C+%22,+%22%0A++++++++++++++%3C%3C+std::numeric_limits%3Cdouble%3E::max()+%3C%3C+%22%5D%5Cn%22%3B%0A++++std::cout+%3C%3C+%22smallest+positive+normalized+double:+%22+%3C%3C+std::numeric_limits%3Cdouble%3E::min()%0A++++++++++++++%3C%3C+!'%5Cn!'%3B%0A++++std::cout+%3C%3C+%22char+is+signed:+%22+%3C%3C+std::numeric_limits%3Cchar%3E::is_signed+%3C%3C+!'%5Cn!'%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/01-types-operators-functions/numeric-limits.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-01-integer-literals]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Aint+main()+%7B%0A++++int+decimal+%3D+162%3B%0A++++int+octal+%3D+0242%3B%0A++++int+hexadecimal+%3D+0xA2%3B%0A++++int+binary+%3D+0b1010!'0010%3B%0A++++unsigned+long+population+%3D+1!'000!'000UL%3B%0A%0A++++std::cout+%3C%3C+decimal+%3C%3C+!'+!'+%3C%3C+octal+%3C%3C+!'+!'+%3C%3C+hexadecimal+%3C%3C+!'+!'+%3C%3C+binary+%3C%3C+!'%5Cn!'%3B%0A++++std::cout+%3C%3C+population+%3C%3C+!'%5Cn!'%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/01-types-operators-functions/integer-literals.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-01-floating-literals]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Aint+main()+%7B%0A++++double+fraction+%3D+0.15%3B%0A++++float+single_precision+%3D+0.15F%3B%0A++++long+double+scientific+%3D+15E-2L%3B%0A++++double+large_value+%3D+1.5E6%3B%0A%0A++++std::cout+%3C%3C+fraction+%3C%3C+!'%5Cn!'%3B%0A++++std::cout+%3C%3C+single_precision+%3C%3C+!'%5Cn!'%3B%0A++++std::cout+%3C%3C+scientific+%3C%3C+!'%5Cn!'%3B%0A++++std::cout+%3C%3C+large_value+%3C%3C+!'%5Cn!'%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/01-types-operators-functions/floating-point-literals.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-01-addition-function]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Aint+addition(int+left,+int+right)+%7B%0A++++return+left+%2B+right%3B%0A%7D%0A%0Aint+main()+%7B%0A++++int+result+%3D+addition(5,+3)%3B%0A++++std::cout+%3C%3C+result+%3C%3C+!'%5Cn!'%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/01-types-operators-functions/addition-function.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-01-function-declaration]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Aint+maximum(int+left,+int+right)%3B%0A%0Aint+main()+%7B%0A++++int+result+%3D+maximum(10,+2)%3B%0A++++std::cout+%3C%3C+result+%3C%3C+!'%5Cn!'%3B%0A%0A++++return+0%3B%0A%7D%0A%0Aint+maximum(int+left,+int+right)+%7B%0A++++return+left+%3E+right+%3F+left+:+right%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/01-types-operators-functions/function-declaration-definition.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-01-void-function]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Avoid+print_message()+%7B%0A++++std::cout+%3C%3C+%22I!'m+a+function!!%5Cn%22%3B%0A%7D%0A%0Aint+main()+%7B%0A++++print_message()%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/01-types-operators-functions/void-function.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-01-command-line-arguments]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Aint+main(int+argc,+char*+argv%5B%5D)+%7B%0A++++for+(int+index+%3D+0%3B+index+%3C+argc%3B+%2B%2Bindex)+%7B%0A++++++++std::cout+%3C%3C+argv%5Bindex%5D+%3C%3C+!'%5Cn!'%3B%0A++++%7D%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/01-types-operators-functions/command-line-arguments.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-01-factorial-recursive]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Aunsigned+long+long+factorial(unsigned+int+number)+%7B%0A++++if+(number+%3D%3D+0)+%7B%0A++++++++return+1%3B%0A++++%7D%0A%0A++++return+number+*+factorial(number+-+1)%3B%0A%7D%0A%0Aint+main()+%7B%0A++++std::cout+%3C%3C+factorial(5)+%3C%3C+!'%5Cn!'%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/01-types-operators-functions/factorial-recursive.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-01-factorial-iterative]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Aunsigned+long+long+factorial(unsigned+int+number)+%7B%0A++++unsigned+long+long+result+%3D+1%3B%0A%0A++++for+(unsigned+int+factor+%3D+2%3B+factor+%3C%3D+number%3B+%2B%2Bfactor)+%7B%0A++++++++result+*%3D+factor%3B%0A++++%7D%0A%0A++++return+result%3B%0A%7D%0A%0Aint+main()+%7B%0A++++std::cout+%3C%3C+factorial(5)+%3C%3C+!'%5Cn!'%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/01-types-operators-functions/factorial-iterative.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-01-name-shadowing]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Aint+x+%3D+0%3B%0Aint+y+%3D+0%3B%0A%0Avoid+print_local_values(double+x)+%7B%0A++++double+y+%3D+3.14%3B%0A++++std::cout+%3C%3C+%22local:+x+%3D+%22+%3C%3C+x+%3C%3C+%22,+y+%3D+%22+%3C%3C+y+%3C%3C+!'%5Cn!'%3B%0A%7D%0A%0Aint+main()+%7B%0A++++x+%3D+21%3B%0A++++y+%3D+239%3B%0A%0A++++%7B%0A++++++++int+x+%3D+10%3B%0A++++++++std::cout+%3C%3C+%22block:+x+%3D+%22+%3C%3C+x+%3C%3C+%22,+y+%3D+%22+%3C%3C+y+%3C%3C+!'%5Cn!'%3B%0A++++++++print_local_values(y)%3B%0A++++%7D%0A%0A++++std::cout+%3C%3C+%22global:+x+%3D+%22+%3C%3C+x+%3C%3C+%22,+y+%3D+%22+%3C%3C+y+%3C%3C+!'%5Cn!'%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/01-types-operators-functions/name-shadowing.cpp" compiler="clang2310" options="-std=c++20 -O0" -->

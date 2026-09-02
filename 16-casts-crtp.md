@@ -6,8 +6,6 @@ title: "Лекция 16. Приведения типов и CRTP"
 
 [Открыть слайды](slides/16-casts-crtp.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1KN15XJnUKzBzvdEdD-LUIhlnrkIv7lcyUltGX6VFIMY/edit)
-
 :::
 
 ## Язык С++
@@ -104,7 +102,7 @@ int main(int, char**) {
 ## const_cast
 
 
-- Убирает const или volatility c переменное
+- Убирает `const` или `volatile` у переменной
 - Может преобразовывать указатели на одинаковые типы данных
 - Может преобразовывать ссылки
 
@@ -123,10 +121,7 @@ int main() {
 
     const char* str = "Hello world!";
     char* s = const_cast<char*>(str);
-```
-
-- // s[0] = 'A'; // Undefined behaviour !!
-```cpp
+    // s[0] = 'A'; // Undefined behaviour !!
 }
 ```
 
@@ -151,7 +146,7 @@ class Foo {
 
 
 - Пытается выполнить  преобразование с помощью конструкторов и операторов приведения
-- Работает в момент compile-time
+- Проверяется во время компиляции
 - Работает для стандартных типов
 - Работает для приведения указателей из одной иерархии
 - Может приводить из указателя на void
@@ -171,7 +166,8 @@ struct Foo {
 };
 
 struct Boo {
-    Boo(const std::string&) {}
+    Boo(const std::string&) {
+    }
 
     operator int() {
         return 2;
@@ -300,7 +296,7 @@ int main(int, char**) {
 ## reinterpret_cast
 
 
-- Позволяет кастовать несовместные типы
+- Позволяет преобразовывать несовместимые типы
 - Использует исключительно побитовое представление
 
 ## reinterpret_cast

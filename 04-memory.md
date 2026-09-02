@@ -6,8 +6,6 @@ title: "Лекция 4. Работа с памятью"
 
 [Открыть слайды](slides/04-memory.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1wlDOCjTv4JXUY1fGPwulFewW5nLbdcsywN7jFesN-Ts/edit)
-
 :::
 
 ## Язык С++
@@ -18,12 +16,12 @@ title: "Лекция 4. Работа с памятью"
 ## Работа программ
 
 
-- Архитектура Фон Неймана\Гарвардская
+- Архитектуры фон Неймана и Гарвардская
 - Виды памяти
 - Процессор
 - Прерывания
 
-## Процессы\потоки
+## Процессы и потоки
 
 
 - Процессы
@@ -38,7 +36,7 @@ title: "Лекция 4. Работа с памятью"
 
 - У каждого процесса “своя” память
 - Иллюзия доступности всех ресурсов
-- Осуществляется мапинг на физическую память
+- Выполняется маппинг на физическую память
 - Page Table
 - Segments
 - ОС также реализует данную логику
@@ -50,7 +48,7 @@ title: "Лекция 4. Работа с памятью"
 <!-- embedded-images:end -->
 
 
-- Маппинг виртуального адреса на физически
+- Маппинг виртуального адреса на физический
 - Изоляция процессов
 - Memory-mapped file
 - Обеспечение безопасного режима работы ОС
@@ -85,9 +83,9 @@ title: "Лекция 4. Работа с памятью"
 
 
 ```cpp
-int main(int argc, char* argv[]) {
+int main() {
     int local = 0;
-    char* str = "Hello world";
+    const char* str = "Hello world";
 
     std::printf("Process id: %d\n", getpid());
 
@@ -124,7 +122,7 @@ int main() {
 }
 ```
 
-## GodBolt.org
+## Compiler Explorer (Godbolt)
 
 <!-- embedded-images:start -->
 ![Изображение 1 со слайда 12](assets/04-memory/slide-12-image-01.png)
@@ -137,17 +135,14 @@ int main() {
 - StackFrame
 - arguments
 - local variable
-```cpp
-return point
-```
-
-- cdecl, stdcall,  fastcall
+- return address
+- cdecl, stdcall, fastcall
 - Регистры процессора
 - esp/rsp (верхушка стека)
 - ebp/rbp (начало кадра)
 - eax (результат)
 
-## Источник
+ya## Источник
 
 <!-- embedded-images:start -->
 ![Изображение 1 со слайда 14](assets/04-memory/slide-14-image-01.png)
@@ -234,10 +229,10 @@ return point
 ## Heap (Куча)
 
 
-- В отличии от стека позволяет создавать динамические структуры большого размера
+- В отличие от стека позволяет создавать динамические структуры большого размера
 - Управление жизнью объектов в куче “ручное”
 
-## Функции работы с памятью  StdLib.h
+## Функции работы с памятью из `<cstdlib>`
 
 
 - malloc
@@ -293,26 +288,20 @@ int main() {
 ## new\delete
 
 
-```cpp
-int main() {
-    int* pr = new int;
-    delete pr;
-
-    int* arr = new int[10];
-    delete[] arr;
-
-    return 0;
-}
+```{.cpp filename="new-delete.cpp"}
+{{< include examples/04-memory/new-delete.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-04-new-delete]{aria-label="Open in Compiler Explorer"}
 
 ## Segmentation fault
 
 
 - Обращение к несуществующему адресу
-- Обращение к сегменту, прав для которого нет
-- Попытка поменять данные в read-only сегменту
+- Обращение к сегменту без необходимых прав доступа
+- Попытка изменить данные в сегменте только для чтения
 - Обращения по нулевому указателю
-- Обращение по указателю на удаленный указатель
+- Обращение через указатель на уже освобождённую память
 - Переполнение стека
 - Переполнение буфера
 
@@ -320,16 +309,13 @@ int main() {
 
 
 ```cpp
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 
 int main(int argc, char* argv[]) {
-```
-
-- uint64_t arr[1048570]; // 8Mb
-```cpp
-arr[10] = 1;
-return 0;
+    uint64_t arr[1048570];  // 8Mb
+    arr[10] = 1;
+    return 0;
 }
 ```
 
@@ -347,3 +333,6 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 ```
+
+[godbolt-04-new-delete]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'int+main()+%7B%0A++++int*+value+%3D+new+int%3B%0A++++delete+value%3B%0A%0A++++int*+array+%3D+new+int%5B10%5D%3B%0A++++delete%5B%5D+array%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/04-memory/new-delete.cpp" compiler="clang2310" options="-std=c++20 -O0" -->

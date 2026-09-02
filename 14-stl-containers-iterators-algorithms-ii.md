@@ -6,8 +6,6 @@ title: "Лекция 14. STL: контейнеры, итераторы и алг
 
 [Открыть слайды](slides/14-stl-containers-iterators-algorithms-ii.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1PlFddq5lwJJ6dHyLOoUyIHCbBPBm77ye1VSvizatT7o/edit)
-
 :::
 
 ## Язык С++
@@ -15,10 +13,11 @@ title: "Лекция 14. STL: контейнеры, итераторы и алг
 
 - STL. Контейнеры, итераторы, алгоритмы - II
 
-## minus;
+## Стандартные функциональные объекты
 
 
-- multiplies
+- `minus`
+- `multiplies`
 - ….
 - equal_to
 - not_equal_to
@@ -43,7 +42,7 @@ title: "Лекция 14. STL: контейнеры, итераторы и алг
 - map<Key,T> (multimap)
 - Неупорядоченные ассоциативные контейнеры
 - unordered_set<Key> (multiset)
-- unordered_map<Ket, T> (multimap)
+- unordered_map<Key, T> (unordered_multimap)
 
 ## Named Requirements
 
@@ -93,12 +92,9 @@ struct array {
     typedef ptrdiff_t difference_type;
 
     _Tp __elems_[_Size];
-```
 
-- …………..
-```cpp
-}
-;
+    // Остальные члены класса опущены.
+};
 ```
 
 ## std::array Container requirements
@@ -206,7 +202,7 @@ class unordered_map;
 ## Allocator
 
 
-- Класс, отвечающий требованиям, основная задача - инкапсулировать стратегию выделения/очистки памяти и созданий/удаления объектов.
+- Класс, основная задача которого — инкапсулировать стратегию выделения и освобождения памяти, а также создания и удаления объектов
 - allocation
 - deallocation
 - construction
@@ -260,21 +256,17 @@ class CSimpleAllocator {
     pointer allocate(size_type size) {
         pointer result = static_cast<pointer>(malloc(size * sizeof(T)));
         if (result == nullptr) {
-```
+            // error
+        }
+        std::cout << "Allocate count" << size << " elements. Pointer:" << result << std::endl;
+        return result;
+    }
 
-- // error
-```cpp
-}
-std::cout << "Allocate count" << size << " elements. Pointer:" << result << std::endl;
-return result;
-}
-
-void deallocate(pointer p, size_type n) {
-    std::cout << "Deallocate pointer: " << p << std::endl;
-    free(p);
-}
-}
-;
+    void deallocate(pointer p, size_type n) {
+        std::cout << "Deallocate pointer: " << p << std::endl;
+        free(p);
+    }
+};
 ```
 
 ## StackAllocator
@@ -348,7 +340,7 @@ int main() {
 ## back_insert_iterator
 
 
-- // Реализовываем (LegacyOutputIterator)
+- Реализуем `LegacyOutputIterator`
 - //
 
 ## Потоковые итераторы
@@ -432,27 +424,20 @@ void evaluate(const T& value) {
 int main() {
     std::vector<int> v = {1, 2, 3, 4, 5};
 
-    std::iterator_traits<std::vector<int>::iterator> tr;
-
     auto it = std::find(v.begin(), v.end(), 3);
-```
 
-- /*
-```cpp
+    /* Упрощённый фрагмент реализации:
 template <typename _Iterator, typename _Predicate>
-```
-
-- inline _Iterator
-- __find_if(_Iterator __first, _Iterator __last, _Predicate __pred)
-```cpp
-{
+inline _Iterator __find_if(
+    _Iterator __first,
+    _Iterator __last,
+    _Predicate __pred
+) {
     return __find_if(__first, __last, __pred, std::__iterator_category(__first));
 }
-```
+    */
 
-- */
-```cpp
-return 0;
+    return it == v.end();
 }
 ```
 
@@ -486,20 +471,9 @@ struct contiguous_iterator_tag : public random_access_iterator_tag {};
 
 ```cpp
 template <class It>
-typename std::iterator_traits<It>::difference_type
-```
-
-- distance(It first, It last)
-```cpp
-{
-   return detail::do_distance(
-```
-
-- first, last,
-```cpp
-           typename std::iterator_traits<It>::iterator_category()
-         );
-           }
+typename std::iterator_traits<It>::difference_type distance(It first, It last) {
+    return detail::do_distance(first, last, typename std::iterator_traits<It>::iterator_category());
+}
 ```
 
 ## Iterator operation

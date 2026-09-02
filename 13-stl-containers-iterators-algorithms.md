@@ -6,8 +6,6 @@ title: "Лекция 13. STL: контейнеры, итераторы и алг
 
 [Открыть слайды](slides/13-stl-containers-iterators-algorithms.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1KYU1Z0Qcz1FqWUk_IL7FAw_84i5SBQKmq1BIi5d3gqM/edit)
-
 :::
 
 ## Язык С++
@@ -18,13 +16,13 @@ title: "Лекция 13. STL: контейнеры, итераторы и алг
 ## Вычислительная сложность
 
 
-- функцию зависимости объема работы, которая выполняется некоторым алгоритмом, от размера входных данных.
+- Функция зависимости объёма работы алгоритма от размера входных данных
 - Асимптотическая сложность (O(n),O(n*n), O(n*log(n)))
 
 ## STL
 
 
-- Библиотека обобщенных компонент
+- Библиотека обобщённых компонентов
 - Контейнеры
 - Обобщенные алгоритмы
 - Итераторы
@@ -48,7 +46,7 @@ title: "Лекция 13. STL: контейнеры, итераторы и алг
 - map<Key,T> (multimap)
 - Неупорядоченные ассоциативные контейнеры
 - unordered_set<Key> (multiset)
-- unordered_map<Ket, T> (multimap)
+- unordered_map<Key, T> (unordered_multimap)
 
 ## Обобщенные алгоритмы
 
@@ -63,7 +61,7 @@ title: "Лекция 13. STL: контейнеры, итераторы и алг
 ## Итераторы
 
 
-- Указателеобразные объекты
+- Указателеподобные объекты
 - Связь между алгоритмами и контейнерами
 - Категории
 - Выходные (LegacyOutputIterator)
@@ -72,7 +70,7 @@ title: "Лекция 13. STL: контейнеры, итераторы и алг
 - Двунаправленные (LegacyBidirectionalIterator)
 - Произвольного доступа (LegacyRandomAccessIterator)
 - Непрерывный (С++17)  ( LegacyContiguousIterator)
-- Диапазон итераторов [first,last)
+- Диапазон итераторов `[first, last)`
 - Корректный диапазон
 - Начиная с С++20, требования к итераторам основаны на концептах (с ними мы познакомимся позже), а не Named requirements
 
@@ -81,19 +79,11 @@ title: "Лекция 13. STL: контейнеры, итераторы и алг
 
 ```cpp
 template <typename InputIterator, typename T>
-```
-
-- Inputlterator find(
-- Inputlterator first,
-- Inputlterator last,
-```cpp
-const T& value
-```
-
-- ) {
-```cpp
-while (first != last && *first != value) ++first;
-return first;
+InputIterator find(InputIterator first, InputIterator last, const T& value) {
+    while (first != last && *first != value) {
+        ++first;
+    }
+    return first;
 }
 ```
 
@@ -111,22 +101,15 @@ return first;
 
 
 ```cpp
-template <typename Inputlterator, typename Outputlterator>
-```
+template <typename InputIterator, typename OutputIterator>
+OutputIterator copy(InputIterator first, InputIterator last, OutputIterator result) {
+    while (first != last) {
+        *result = *first;
+        ++first;
+        ++result;
+    }
 
-- Outputlterator copy(
-- InputIterator first,
-- Inputlterator last,
-- Outputlterator result
-- ) {
-```cpp
-while (first != last) {
-    *result = *first;
-    ++first;
-    ++result;
-}
-
-return result;
+    return result;
 }
 ```
 
@@ -149,43 +132,26 @@ return result;
 
 
 ```cpp
-template <typename Forwardlterator, typename T>
-```
+template <typename ForwardIterator, typename T>
+void replace(ForwardIterator first, ForwardIterator last, const T& old_value, const T& new_value) {
+    while (first != last) {
+        if (*first == old_value) {
+            *first = new_value;
+        }
 
-- void replace(
-- Forwardlterator first,
-- Forwardlterator last,
-```cpp
-const T &x, const T &y
-```
-
-- ) {
-```cpp
-while (first != last) {
-    if (*first == x) *first = y;
-
-    ++first;
-}
+        ++first;
+    }
 }
 ```
 
 ## Двунаправленные итераторы
 
 
-```cpp
-#include <list>
-#include <algorithm>
-
-int main() {
-    int a[10] = {12, 3, 25, 7, 11, 213, 7, 123, 29, -3l};
-    std::reverse(&a[0], &a[10]);
-
-    std::list<int> l(&a[0], &a[10]);
-    std::reverse(l.begin(), l.end());
-
-    return 0;
-}
+```{.cpp filename="reverse-iterators.cpp"}
+{{< include examples/13-stl-containers-iterators-algorithms/reverse-iterators.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-13-reverse-iterators]{aria-label="Open in Compiler Explorer"}
 
 ## Двунаправленные итераторы
 
@@ -198,10 +164,7 @@ int main() {
 
 ```cpp
 std::vector<int> v;
-```
-
-- // …. Заполнение вектора
-```cpp
+// …. Заполнение вектора
 bool b = std::binary_search(v.begin(), v.end(), 6);
 ```
 
@@ -214,9 +177,8 @@ bool b = std::binary_search(v.begin(), v.end(), 6);
 - r+n, n+r, r-n
 - r[n]=*(r+n)
 - r+=n, r-=n
-```cpp
-r - s->int r<s, r> s, r <= s, r >= s->bool
-```
+- `r - s` возвращает разность итераторов
+- `r < s`, `r > s`, `r <= s`, `r >= s` возвращают `bool`
 
 ## Непрерывный итератор
 
@@ -234,13 +196,13 @@ r - s->int r<s, r> s, r <= s, r >= s->bool
 - Двунаправленное итераторы
 - Итераторы с произвольным доступом
 - Непрерывный итератор
-- Иерархия требования
+- Иерархия требований
 
 ## Итераторы
 
 
 - Описание контейнеров включает описание предоставляемых ими итераторов
-- Описание обобщенных алгоритмов включает описание категорий итераторов с которыми они работают
+- Описание обобщённых алгоритмов включает категории итераторов, с которыми они работают
 - Вывод:
 - Интерфейсы контейнеров и алгоритмов STL спроектированы так, чтобы поддерживать эффективные комбинации и препятствовать неэффективным
 
@@ -258,46 +220,33 @@ vector<int>::const_iterator i = v.cbegin();
 ## Итератор
 
 
-- Контейнер | Итератор | Тип
-- T a[n] | T* | Изм. Непрерывный
-- T a[n] | const T* | Конст. Непрерывный
-```cpp
-vector<T> | vector<T>::iterator | Изм.Непрерывный vector<T> | vector<T>::const_iterator |
-    Конст.Непрерывный deque<T> | deque<T>::iterator | Изм.Произв доступ deque<T> |
-    deque<T>::const_iterator | Конст.,
-    произв доступ list<T> | list<T>::iterator | Изм.,
-    двунаправленный list<T> | list<T>::const_iterator | Конст., двунаправленный
-```
+| Контейнер | Итератор | Доступ | Категория |
+|---|---|---|---|
+| `T[N]` | `T*` | изменяемый | непрерывный |
+| `const T[N]` | `const T*` | константный | непрерывный |
+| `std::vector<T>` | `iterator` / `const_iterator` | изм. / конст. | непрерывный |
+| `std::deque<T>` | `iterator` / `const_iterator` | изм. / конст. | произвольный |
+| `std::list<T>` | `iterator` / `const_iterator` | изм. / конст. | двунаправленный |
 
 ## Итераторы
 
 
-- Контейнер | Итератор | Тип
-```cpp
-set<t> | set<t>::iterator | Конст., двунапр.set<t> | set<t>::const_iterator | Конст.,
-    двунапр.multiset<T> | multiset<T>::iterator | Конст.,
-    двунапр.multiset<T> | multiset<T>::const_iterator | Конст.,
-    двунапр.map<Key, T> | map<Key, T>::iterator | Изм.,
-    двунаправленный map<Key, T> | map<Key, T>::const_iterator | Конст.,
-    двунапр.multimap<Key, T> | multimap<Key, T>::iterator | Изм.,
-    двунаправленный multimap<Key, T> | multimap<Key, T>::const_iterator | Конст., двунапр.
-```
+| Контейнер | Итератор | Доступ | Категория |
+|---|---|---|---|
+| `std::set<T>` | `iterator` / `const_iterator` | константный | двунаправленный |
+| `std::multiset<T>` | `iterator` / `const_iterator` | константный | двунаправленный |
+| `std::map<Key, T>` | `iterator` / `const_iterator` | изм. value / конст. | двунаправленный |
+| `std::multimap<Key, T>` | `iterator` / `const_iterator` | изм. value / конст. | двунаправленный |
 
 ## Итераторы
 
 
-- Контейнер | Итератор | Тип
-```cpp
-unordered_set<t> | unordered_set<t>::iterator | изм.,
-    однонапр.unordered_set<t> | unordered_set<t>::const_iterator | Конст.,
-    однонапр.unordered_map<Key, T> | unordered_map<Key, T>::iterator | Изм.,
-    однонапр.unordered_map<Key, T> | unordered_map<Key, T>::const_iterator | Конст.,
-    однонапр.unordered_multiset<t> | unordered_multiset<t>::iterator | изм.,
-    однонапр.unordered_multiset<t> | unordered_multiset<t>::const_iterator | Конст.,
-    однонапр.unordered_multimap<Key, T> | unordered_multimap<Key, T>::iterator | Изм.,
-    однонапр.unordered_multimap<Key, T> | unordered_multimap<Key, T>::const_iterator | Конст.,
-    однонапр.
-```
+| Контейнер | Итератор | Доступ | Категория |
+|---|---|---|---|
+| `std::unordered_set<T>` | `iterator` / `const_iterator` | константный | однонаправленный |
+| `std::unordered_multiset<T>` | `iterator` / `const_iterator` | константный | однонаправленный |
+| `std::unordered_map<Key, T>` | `iterator` / `const_iterator` | изм. value / конст. | однонаправленный |
+| `std::unordered_multimap<Key, T>` | `iterator` / `const_iterator` | изм. value / конст. | однонаправленный |
 
 ## Обобщенные алгоритмы
 
@@ -343,12 +292,10 @@ int main() {
 ```cpp
 class GreaterThan50 {
    public:
-```
-
-- bool operator()(int x) const { return x > 50;}
-```cpp
-}
-;
+    bool operator()(int x) const {
+        return x > 50;
+    }
+};
 
 int main() {
     std::vector<int> v;
@@ -387,10 +334,9 @@ int main() {
 - fill
 - generate
 - partition
-- random_shuffle
+- shuffle
 - remove
 - replace
-- remove
 - rotate
 - swap
 - swap_ranges
@@ -422,13 +368,13 @@ class calc_square {
     T i;
 
    public:
-    calc_square() : i(0) {}
-```
-
-- T operator()() { ++i; return i * i; }
-```cpp
-}
-;
+    calc_square() : i(0) {
+    }
+    T operator()() {
+        ++i;
+        return i * i;
+    }
+};
 
 int main() {
     std::vector<int> v(10);
@@ -441,7 +387,7 @@ int main() {
 
 ```cpp
 int main() {
-    std::vector<int> veс = {1, 2, 0, 3, 4, 0, 5, 6, 7, 0, 8};
+    std::vector<int> vec = {1, 2, 0, 3, 4, 0, 5, 6, 7, 0, 8};
 
     std::vector<int>::iterator new_end = std::remove(vec.begin(), vec.end(), 0);
 
@@ -458,10 +404,10 @@ int main() {
 - set_difference
 - set_symmetric_difference
 
-## includes
+## `std::includes`
 
 
-- Задача: Проверить содержится ли элементы одного сортированного диапазона в другом сортированном диапазоне
+- Задача: проверить, содержатся ли элементы одного сортированного диапазона в другом
 ```cpp
 int main() {
     bool result;
@@ -485,17 +431,10 @@ int main() {
     std::vector<char> v2 = to_vector("aeiou");
 
     std::vector<char> setUnion;
-   std::set_union(
-```
+    std::set_union(v1.begin(), v1.end(), v2.begin(), v2.end(), back_inserter(setUnion));
 
-- v1.begin(), v1.end(),
-- v2.begin(), v2.end(),
-- back_inserter(setUnion)
-```cpp
-   );
-
-   return 0;
-   }
+    return 0;
+}
 ```
 
 ## Обобщенные числовые алгоритмы
@@ -539,3 +478,6 @@ int main() {
         std::inner_product(&x1[0], &x1[5], &x2[0], 1, std::multiplies<int>(), std::plus<int>());
 }
 ```
+
+[godbolt-13-reverse-iterators]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Calgorithm%3E%0A%23include+%3Ciostream%3E%0A%23include+%3Clist%3E%0A%0Aint+main()+%7B%0A++++int+values%5B%5D+%3D+%7B12,+3,+25,+7,+11,+213,+7,+123,+29,+-3%7D%3B%0A++++std::reverse(std::begin(values),+std::end(values))%3B%0A%0A++++std::list%3Cint%3E+numbers(std::begin(values),+std::end(values))%3B%0A++++std::reverse(numbers.begin(),+numbers.end())%3B%0A%0A++++for+(int+number+:+numbers)+%7B%0A++++++++std::cout+%3C%3C+number+%3C%3C+!'+!'%3B%0A++++%7D%0A++++std::cout+%3C%3C+!'%5Cn!'%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/13-stl-containers-iterators-algorithms/reverse-iterators.cpp" compiler="clang2310" options="-std=c++20 -O0" -->

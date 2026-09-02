@@ -6,8 +6,6 @@ title: "Лекция 3. Структуры и объединения"
 
 [Открыть слайды](slides/03-struct-union.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1T35d8A7BWSHqhICtrK9d_z1-EnlnLThijbci3W6qvro/edit)
-
 :::
 
 В этой лекции рассматриваются составные типы данных в C++. Структуры позволяют объединять связанные значения в один объект, а объединения — использовать одну область памяти для нескольких альтернативных представлений.
@@ -49,23 +47,11 @@ Point third{.x = 10, .y = 20};
 
 Для обращения к полю обычного объекта используется оператор `.`:
 
-```cpp
-#include <iostream>
-
-struct Point {
-    int x;
-    int y;
-};
-
-int main() {
-    Point point{};
-
-    point.x = 200;
-    point.y = 250;
-
-    std::cout << point.x << ' ' << point.y << '\n';
-}
+```{.cpp filename="point-structure.cpp"}
+{{< include examples/03-struct-union/point-structure.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-03-point-structure]{aria-label="Open in Compiler Explorer"}
 
 Инициализация `Point point{};` обнуляет оба поля. Если написать только `Point point;`, значения полей фундаментальных типов останутся неопределёнными.
 
@@ -73,26 +59,11 @@ int main() {
 
 Полем структуры может быть объект другого пользовательского типа. Так можно собирать более сложные модели из простых компонентов:
 
-```cpp
-struct Point {
-    int x;
-    int y;
-};
-
-struct Rectangle {
-    Point left_top;
-    Point right_bottom;
-};
-
-int main() {
-    Rectangle rectangle{
-        .left_top = {0, 100},
-        .right_bottom = {200, 0},
-    };
-
-    rectangle.left_top.x = 10;
-}
+```{.cpp filename="nested-structures.cpp"}
+{{< include examples/03-struct-union/nested-structures.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-03-nested-structures]{aria-label="Open in Compiler Explorer"}
 
 Выражение `rectangle.left_top.x` последовательно выбирает поле `left_top`, а затем его координату `x`.
 
@@ -466,3 +437,9 @@ BENCHMARK_MAIN();
 6. Почему чтение неактивного поля `union` небезопасно?
 7. Как `std::variant` упрощает работу с альтернативными типами?
 8. Зачем в микробенчмарке нужен `benchmark::DoNotOptimize`?
+
+[godbolt-03-point-structure]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Astruct+Point+%7B%0A++++int+x%3B%0A++++int+y%3B%0A%7D%3B%0A%0Aint+main()+%7B%0A++++Point+point%7B%7D%3B%0A++++point.x+%3D+200%3B%0A++++point.y+%3D+250%3B%0A%0A++++std::cout+%3C%3C+point.x+%3C%3C+!'+!'+%3C%3C+point.y+%3C%3C+!'%5Cn!'%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/03-struct-union/point-structure.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-03-nested-structures]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Astruct+Point+%7B%0A++++int+x%3B%0A++++int+y%3B%0A%7D%3B%0A%0Astruct+Rectangle+%7B%0A++++Point+left_top%3B%0A++++Point+right_bottom%3B%0A%7D%3B%0A%0Aint+main()+%7B%0A++++Rectangle+rectangle%7B%0A++++++++.left_top+%3D+%7B0,+100%7D,%0A++++++++.right_bottom+%3D+%7B200,+0%7D,%0A++++%7D%3B%0A%0A++++rectangle.left_top.x+%3D+10%3B%0A++++std::cout+%3C%3C+rectangle.left_top.x+%3C%3C+!'%5Cn!'%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/03-struct-union/nested-structures.cpp" compiler="clang2310" options="-std=c++20 -O0" -->

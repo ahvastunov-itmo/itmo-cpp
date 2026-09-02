@@ -6,8 +6,6 @@ title: "Лекция 6. Компилятор и препроцессор"
 
 [Открыть слайды](slides/06-compiler-preprocessor.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1XQGxRjDvRg-kp6ULItdyAmgV3s5LFyvX9n9sVwZcv6g/edit)
-
 :::
 
 ## Язык С++
@@ -23,8 +21,8 @@ title: "Лекция 6. Компилятор и препроцессор"
 - Ускорение процесса компиляции
 - Небольшие файлы проще читать и редактировать
 - Есть два типа файлов
-- Заголовочные (*.h , *.hpp)
-- С исходным кодом (*.cpp)
+- Заголовочные (`*.h`, `*.hpp`)
+- С исходным кодом (`*.cpp`)
 
 ## Этапы трансляции
 
@@ -34,8 +32,8 @@ title: "Лекция 6. Компилятор и препроцессор"
 
 
 - Препроцессор
-- Компиляции
-- Линковщик
+- Компилятор
+- Компоновщик
 - NB! На самом деле этапов 9
 
 ## Этапы трансляции
@@ -51,11 +49,11 @@ title: "Лекция 6. Компилятор и препроцессор"
 
 
 - Declaration
-- Задает имя и прочие атрибуты для сущностей (например сигнатуру функции)
+- Задаёт имя и другие атрибуты сущности, например сигнатуру функции
 - Сколько угодно раз
 - Definition
 - Полностью определяет сущность
-- Является одновременное объявлением
+- Одновременно является объявлением
 
 ## Объявление и определение
 
@@ -63,10 +61,7 @@ title: "Лекция 6. Компилятор и препроцессор"
 - // declaration
 ```cpp
 int add(int a, int b);
-```
-
-- //definition
-```cpp
+// definition
 int add(int a, int b) {
     return a + b;
 }
@@ -81,10 +76,7 @@ int add(int a, int b) {
 int add(int a, int b) {
     return a + b;
 }
-```
-
-- // main.cpp
-```cpp
+// main.cpp
 int add(int a, int b);
 
 int main() {
@@ -118,10 +110,7 @@ int add(int a, int b);
 - #pragma once
 ```cpp
 int add(int a, int b);
-```
-
-- // main.cpp
-```cpp
+// main.cpp
 #include "math.h"
 
 int main(int, char**) {
@@ -135,28 +124,26 @@ int main(int, char**) {
 
 - Язык препроцессора – это специальный язык программирования, встроенный в C++.
 - Лексический анализ кода.
-- Команды языка препроцессор называют директивами, все директивы начинаются со знака #.
+- Команды языка препроцессора называют директивами, все директивы начинаются со знака #.
 - Директива #include позволяет подключать заголовочные файлы к файлам кода.
 - Препроцессор заменяет директиву #include "bar.h" на содержимое файла bar.h.
 
 ## Препроцессор
 
 
-```cpp
-#define и #unded(__FILE__, __LINE__, …)
-```
+- Макросы: `#define`, `#undef`
+- Предопределённые макросы: `__FILE__`, `__LINE__`
+- Операторы макросов: `#` и `##`
+- Условное включение: `#if`, `#ifdef`, `#ifndef`, `#elif`, `#else`, `#endif`
+- Подключение файлов:
 
-- # and ## operators
-- Условное включение( #if #ifdef #ifndef #elif #else #endif)
 ```cpp
-#include
 #include <filename>
+
 #include "filename"
 ```
 
-- #pragma once
-- #error
-- etc
+- Другие директивы: `#pragma once`, `#error`
 
 ## \#include
 
@@ -183,10 +170,7 @@ int main(int, char**) {
 - # 1 "./math.h" 1
 ```cpp
 int add(int a, int b);
-```
-
-- # 2 "main.cpp" 2
-```cpp
+# 2 "main.cpp" 2
 int main(int, char**) {
     int c = add(10, 2);
     return 0;
@@ -206,21 +190,11 @@ int main(int, char**) {
 ## Макросы
 
 
-```cpp
-#include <iostream>
-
-#define MAX(x, y) (x > y ? x : y)
-
-int main() {
+```{.cpp filename="macro-max.cpp"}
+{{< include examples/06-compiler-preprocessor/macro-max.cpp >}}
 ```
 
-- // Some comment
-```cpp
-std::cout << MAX(10, 20) << std::endl;
-
-return 0;
-}
-```
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-06-macro-max]{aria-label="Open in Compiler Explorer"}
 
 ## Макросы
 
@@ -249,7 +223,7 @@ int main() {
 #endif
 
 int main() {
-    error_log("fatal errro no: %d", 1);
+    error_log("fatal error no: %d", 1);
 
     return 0;
 }
@@ -276,10 +250,7 @@ int main() {
 int add(int a, int b);
 
 #endif
-```
-
-- #pragma once
-```cpp
+#pragma once
 int add(int a, int b);
 ```
 
@@ -292,10 +263,7 @@ struct SomeStruct {
     int i;
     char ch;
 };
-```
-
-- #pragma pack
-```cpp
+#pragma pack
 int main() {
     printf("%d\n", sizeof(struct SomeStruct));
     return 0;
@@ -307,7 +275,7 @@ int main() {
 
 - На вход компилятору поступает код на C++ после обработки препроцессором.
 - Каждый файл с кодом компилируется отдельно и независимо от других файлов с кодом.
-- Компилируется только файлы с кодом (т.е. *.cpp).
+- Компилируются только файлы с кодом, то есть `*.cpp`.
 - Заголовочные файлы сами по себе ни во что не компилируются, только в составе файлов с кодом.
 - На выходе компилятора из каждого файла с кодом получается “объектный файл” — бинарный файл со скомпилированным кодом (с расширением .o или .obj).
 
@@ -323,10 +291,7 @@ void increment(int& v) {
 int add(int a, int b) {
     return a + b;
 }
-```
-
-- // main.cpp
-```cpp
+// main.cpp
 int main(int, char**) {
     int x = 1;
     int y = 2;
@@ -400,8 +365,9 @@ int main(int, char**) {
 void increment(int& v);
 int add(int a, int b);
 
-#include "math.h"
 #include <iostream>
+
+#include "math.h"
 
 int main(int, char**) {
     int x = 1;
@@ -414,10 +380,7 @@ int main(int, char**) {
 
     return 0;
 }
-```
-
-- // math.cpp
-```cpp
+// math.cpp
 #include "math.h"
 void increment(int& v) {
     ++v;
@@ -433,29 +396,24 @@ int add(int a, int b) {
 
 - External - доступность из всех единиц трансляции
 - Internal - доступность из текущей единицы трансляции
-- No linkage - только текущий скоуп
+- No linkage — только текущая область видимости
 
 ## Storage duration
 
 
-- automatic  -  время жизни ограничено скоупом объявления
-```cpp
-static - время жизни от запуска программу и до ее окончания
-```
-
-- thread       - время жизни ограничено потоком
-- dynamic   - new\delete
+- automatic — время жизни ограничено областью объявления
+- static — время жизни от запуска программы до её окончания
+- thread — время жизни ограничено потоком
+- dynamic — `new`/`delete`
 
 ## Storage class specifier
 
 
-```cpp
-static - static duration and internal linkage
-```
-
-- extern - static duration and external linkage
-- thread_local - thread storage duration
-- mutable
+- `static` на уровне пространства имён — static storage duration и internal linkage
+- локальная `static`-переменная — static storage duration без linkage
+- `extern` — объявление имени с external linkage
+- `thread_local` — thread storage duration
+- `mutable` разрешает изменять поле `const`-объекта
 
 ## Storage duration and linkage
 
@@ -478,8 +436,9 @@ void PrintInfo();
 
 - // math.cpp
 ```cpp
-#include "math.h"
 #include <iostream>
+
+#include "math.h"
 
 void PrintInfo() {
     std::cout << PI << " Address of PI:" << &PI << std::endl;
@@ -494,8 +453,9 @@ void PrintInfo() {
 
 
 ```cpp
-#include "math.h"
 #include <iostream>
+
+#include "math.h"
 const float Exp = 2.72f;
 float Exp2 = 2.72f;
 
@@ -533,3 +493,6 @@ int main(int, char**) {
 
 - Ошибки компиляции
 - Ошибки линковки
+
+[godbolt-06-macro-max]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0A%23define+MAXIMUM(x,+y)+((x)+%3E+(y)+%3F+(x)+:+(y))%0A%0Aint+main()+%7B%0A++++std::cout+%3C%3C+MAXIMUM(10,+20)+%3C%3C+!'%5Cn!'%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/06-compiler-preprocessor/macro-max.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
