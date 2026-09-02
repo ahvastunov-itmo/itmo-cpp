@@ -6,8 +6,6 @@ title: "Лекция 9. Наследование и полиморфизм"
 
 [Открыть слайды](slides/09-oop-inheritance-polymorphism.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1biio_zFvspHq_OjWmjsrvfrRXsj3seYrmsTfUlBW0Yo/edit)
-
 :::
 
 ## Язык С++
@@ -22,35 +20,31 @@ title: "Лекция 9. Наследование и полиморфизм"
 class CPerson {
    public:
     CPerson(const std::string& name, unsigned yearOfBirth)
-```
+        : yearOfBirth_(yearOfBirth), name_(name) {
+    }
 
-- : yearOfBirth_(yearOfBirth)
-```cpp
-, name_(name) {}
+    unsigned age() const {
+        const std::chrono::time_point now{std::chrono::system_clock::now()};
+        const std::chrono::year_month_day ymd{std::chrono::floor<std::chrono::days>(now)};
 
-unsigned age() const {
-    const std::chrono::time_point now{std::chrono::system_clock::now()};
-    const std::chrono::year_month_day ymd{std::chrono::floor<std::chrono::days>(now)};
+        return static_cast<int>(ymd.year()) - yearOfBirth_;
+    }
+    const std::string& name() const {
+        return name_;
+    }
 
-    return static_cast<int>(ymd.year()) - yearOfBirth_;
-}
-const std::string& name() const {
-    return name_;
-}
-
-private:
-std::string name_;
-unsigned yearOfBirth_;
-}
-;
+   private:
+    std::string name_;
+    unsigned yearOfBirth_;
+};
 ```
 
 ## Наследование
 
 
-- позволяет описать новый класс на основе уже существующего с частично или полностью заимствующейся функциональностью. Класс, от которого производится наследование, называется базовым, родительским или суперклассом. Новый класс — потомком, наследником, дочерним или производным классом.
+- Позволяет описать новый класс на основе существующего и частично или полностью переиспользовать его функциональность. Исходный класс называют базовым, а новый — производным.
 - полиморфизм подтипов, is-a relationship
-- обеспечивает повторное использование кода (следствие но не причина)
+- Обеспечивает повторное использование кода — это следствие, но не главная причина наследования
 - множественное наследование
 
 ## Наследование
@@ -60,18 +54,12 @@ unsigned yearOfBirth_;
 class CStudent : public CPerson {
    public:
     CStudent(const std::string& name, unsigned age, const std::string& university)
-```
+        : CPerson(name, age), university_(university) {
+    }
 
-- : CPerson(name, age)
-- , university_(university)
-```cpp
-{
-}
-
-private:
-std::string university_;
-}
-;
+   private:
+    std::string university_;
+};
 ```
 
 ## Наследование
@@ -83,7 +71,7 @@ std::string university_;
 - Приведение к базовому классу (slicing)
 - Модификаторы доступа
 
-## Constructor\Destructor order
+## Constructor/Destructor order
 
 
 ## Наследование
@@ -100,26 +88,20 @@ std::string university_;
 class CStudent : public CPerson {
    public:
     CStudent(const std::string& name, unsigned yearOfBirth, const std::string& university)
-```
+        : CPerson(name, yearOfBirth), university_(university) {
+    }
 
-- : CPerson(name, yearOfBirth)
-- , university_(university)
-```cpp
-{
-}
+    const std::string& university() const {
+        return university_;
+    }
 
-const std::string& university() const {
-    return university_;
-}
+    void Hello() const {
+        std::cout << "Hello. I'am " << name() << " I'am from " << university_ << std::endl;
+    }
 
-void Hello() const {
-    std::cout << "Hello. I'am " << name() << " I'am from " << university_ << std::endl;
-}
-
-private:
-std::string university_;
-}
-;
+   private:
+    std::string university_;
+};
 ```
 
 ## Наследование
@@ -130,19 +112,13 @@ std::string university_;
 class CBudgetStudent : public CStudent {
    public:
     CBudgetStudent(const std::string& name, unsigned yearOfBirth, const std::string& university,
-                   unsigned sallary)
-```
+                   unsigned salary)
+        : CStudent(name, yearOfBirth, university), salary_(salary) {
+    }
 
-- : CStudent(name, yearOfBirth, university)
-- , sallary_(sallary)
-```cpp
-{
-}
-
-private:
-unsigned sallary_;
-}
-;
+   private:
+    unsigned salary_;
+};
 ```
 
 ## is-a relationship
@@ -215,19 +191,13 @@ double area(Square& s) {
 ```cpp
 class CEmployee : public CPerson {
    public:
-    CEmployee(const std::string& name, int yearOfBirth, unsigned sallary)
-```
+    CEmployee(const std::string& name, int yearOfBirth, unsigned salary)
+        : CPerson(name, yearOfBirth), salary_(salary) {
+    }
 
-- : CPerson(name, yearOfBirth)
-- , sallary_(sallary)
-```cpp
-{
-}
-
-private:
-unsigned sallary_;
-}
-;
+   private:
+    unsigned salary_;
+};
 ```
 
 ## Множественное наследование
@@ -236,28 +206,12 @@ unsigned sallary_;
 ```cpp
 class CIntern : public CEmployee, public CBudgetStudent {
    public:
-```
-
-- CIntern(
-```cpp
-const std::string &name,
-```
-
-- int yearOfBirth,
-```cpp
-const std::string &university,
-```
-
-- unsigned universSallary,
-- unsigned workSallary
-- )
-- : CEmployee(name, yearOfBirth, workSallary)
-- , CBudgetStudent(name, yearOfBirth, university, universeSallary)
-```cpp
-{
-}
-}
-;
+    CIntern(const std::string& name, int yearOfBirth, const std::string& university,
+            unsigned universitySalary, unsigned workSalary)
+        : CEmployee(name, yearOfBirth, workSalary),
+          CBudgetStudent(name, yearOfBirth, university, universitySalary) {
+    }
+};
 ```
 
 ## Множественное наследование
@@ -297,38 +251,38 @@ int main(int, char**) {
 ```cpp
 class CEmployee : public CPerson {
    public:
-    void IncreaseSallary() {
-        sallary_ += 1000;
+    void IncreaseSalary() {
+        salary_ += 1000;
     }
 
    protected:
-    unsigned sallary_;
+    unsigned salary_;
 };
 
 class CBudgetStudent : public CStudent {
    public:
-    void IncreaseSallary() {
-        sallary_ += 1000;
+    void IncreaseSalary() {
+        salary_ += 1000;
     }
 
    protected:
-    unsigned sallary_;
+    unsigned salary_;
 };
 
 class CIntern : public CEmployee, public CBudgetStudent {
    public:
-    using CEmployee::IncreaseSallary;
+    using CEmployee::IncreaseSalary;
 
-    unsigned Sallary() const {
-        return CEmployee::sallary_ + CBudgetStudent::sallary_;
+    unsigned Salary() const {
+        return CEmployee::salary_ + CBudgetStudent::salary_;
     }
 };
 
 int main(int, char**) {
     CIntern intern("Ivan Ivanov", 2002, "ITMO", 20000, 50000);
 
-    intern.IncreaseSallary();
-    std::cout << intern.Sallary() << std::endl;
+    intern.IncreaseSalary();
+    std::cout << intern.Salary() << std::endl;
 
     return 0;
 }
@@ -354,21 +308,18 @@ int main(int, char**) {
 ```cpp
 class ILogger {
    public:
-    virtual void Log(const char* message) {}
+    virtual void Log(const char* message) {
+    }
 
     virtual ~ILogger() = default;
 };
 
 class CConsoleLogger : public ILogger {
    public:
-```
-
-- void Log(const char* message) override {
-```cpp
-std::cout << message << std::endl;
-}
-}
-;
+    void Log(const char* message) override {
+        std::cout << message << std::endl;
+    }
+};
 ```
 
 ## Виртуальные функции
@@ -377,40 +328,32 @@ std::cout << message << std::endl;
 ```cpp
 class CFileLogger : public ILogger {
    public:
-```
+    CFileLogger(const char* filename) : stream_(filename) {
+    }
 
-- CFileLogger(const char* filename)
-- : stream_(filename)
-```cpp
-{
-}
+    ~CFileLogger() {
+        stream_.close();
+    }
 
-~CFileLogger() {
-    stream_.close();
-}
+    CFileLogger(const CFileLogger&) = delete;
+    CFileLogger& operator=(const CFileLogger&) = delete;
+    void Log(const char* message) override {
+        stream_ << message << std::endl;
+    }
 
-CFileLogger(const CFileLogger&) = delete;
-CFileLogger& operator=(const CFileLogger&) = delete;
-```
-
-- void Log(const char* message) override {
-```cpp
-stream_ << message << std::endl;
-}
-
-private:
-std::ofstream stream_;
+   private:
+    std::ofstream stream_;
 }
 ```
 
 ## Таблица виртуальных функций
 
 
-- Таблица заводится для любого класс с виртуальной функции
+- Таблица обычно создаётся для класса с виртуальными функциями
 - Вызов виртуального метода — это вызов метода по адресу из таблицы
-- Стандарт не определяет механизм реализации виртуальных функций, однако большинство компиляторов реализуют именно таблицу вирутальных функций
+- Стандарт не определяет механизм реализации виртуальных функций, однако большинство компиляторов используют таблицу виртуальных функций
 
-## Слайд 26
+## Таблица виртуальных функций: схема
 
 <!-- embedded-images:start -->
 ![Изображение 1 со слайда 26](assets/09-oop-inheritance-polymorphism/slide-26-image-01.jpg)
@@ -423,21 +366,18 @@ std::ofstream stream_;
 ```cpp
 class ILogger {
    public:
-    virtual void Log(const char* message) {}
+    virtual void Log(const char* message) {
+    }
 
     virtual ~ILogger() = default;
 };
 
 class CConsoleLogger : public ILogger {
    public:
-```
-
-- void Log(const char* message) override {
-```cpp
-std::cout << message << std::endl;
-}
-}
-;
+    void Log(const char* message) override {
+        std::cout << message << std::endl;
+    }
+};
 ```
 
 ## final
@@ -446,25 +386,17 @@ std::cout << message << std::endl;
 ```cpp
 class CConsoleLogger : public ILogger {
    public:
-```
-
-- void Log(const char* message) final {
-```cpp
-std::cout << message << std::endl;
-}
-}
-;
+    void Log(const char* message) final {
+        std::cout << message << std::endl;
+    }
+};
 
 class CModernConsoleLogger : public CConsoleLogger {
    public:
-```
-
-- void Log(const char* message) override {   // Compile-time error
-```cpp
-std::print("{0}", message);
-}
-}
-;
+    void Log(const char* message) override {  // Compile-time error
+        std::cout << message;
+    }
+};
 ```
 
 ## Virtual destructor
@@ -481,18 +413,18 @@ class Base {
     }
 };
 
-class Derrived : public Base {
+class Derived : public Base {
    public:
-    Derrived() {
-        std::cout << "Derrived\n";
+    Derived() {
+        std::cout << "Derived\n";
     }
-    ~Derrived() {
-        std::cout << "~Derrived\n";
+    ~Derived() {
+        std::cout << "~Derived\n";
     }
 };
 
 int main(int, char**) {
-    Base* d = new Derrived;
+    Base* d = new Derived;
     delete d;
 
     return 0;
@@ -510,17 +442,14 @@ class ILogger {
 };
 
 int main(int, char**) {
-```
-
-- ILogger log;  // Error : variable type 'ILogger' is an abstract class
-```cpp
-return 0;
+    ILogger log;  // Error : variable type 'ILogger' is an abstract class
+    return 0;
 }
 ```
 
-- класс экземпляр которого не может быть создан
-- обычно используется в качестве базового класса
-- содержит хотя бы 1 pure virtual function (чисто виртуальную функцию)
+- Класс, экземпляр которого нельзя создать
+- Обычно используется в качестве базового класса
+- Содержит хотя бы одну чисто виртуальную функцию (`pure virtual function`)
 
 ## Коллекции полиморфных объектов
 
@@ -551,14 +480,10 @@ class Base {
 
 class Derived : public Base {
    protected:
-```
-
-- void doWorkImpl() override {
-```cpp
-cout << "Doing work in Derived\n";
-}
-}
-;
+    void doWorkImpl() override {
+        cout << "Doing work in Derived\n";
+    }
+};
 ```
 
 ## Virtual Friend Function Idiom
@@ -586,10 +511,10 @@ std::ostream& operator<<(std::ostream& stream, const Base& value) {
 
 
 ```cpp
-class Derrived : public Base {
+class Derived : public Base {
    protected:
     void printImpl(std::ostream& stream) const override {
-        stream << "Derrived\n";
+        stream << "Derived\n";
     }
 };
 ```
@@ -598,7 +523,7 @@ class Derrived : public Base {
 
 
 - Лишнее обращение к таблице вместо явного адреса
-- Не возможно сделать inline optimization
+- Виртуальный вызов может затруднить инлайнинг
 - Для коллекций объектов - они всегда в куче
 - Порядок объектов также может влиять на скорость
 
@@ -608,4 +533,4 @@ class Derrived : public Base {
 - Абстракция
 - Инкапсуляция
 - Наследование
-- Полиформизм
+- Полиморфизм

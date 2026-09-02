@@ -6,8 +6,6 @@ title: "Лекция 11. Шаблоны классов и функций — I"
 
 [Открыть слайды](slides/11-templates-classes-functions.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1HD87XioCGgkiUfKJY1prQpsXkkLcIbNc-QkQoFmG0zA/edit)
-
 :::
 
 ## Язык С++
@@ -34,7 +32,7 @@ const CRational& max(const CRational& a, const CRational& b) {
 - Шаблоны определяют семейство функций, классов, типов и переменных
 - Шаблон параметризуется одним или несколькими параметрами, которые могут являться:
 - Тип
-- Константные выражения (интегральных типов, энумов)
+- Константные выражения целочисленных типов и перечислений
 - Указатели (на объект, функцию, член класса)
 ```cpp
 std::nullptr_t
@@ -73,8 +71,8 @@ int main() {
 }
 ```
 
-- Перед инстанциацией все параметра шаблона должны быть известны
-- Компилятор, может вывести эти параметры из аргументов, если это можно сделать однозначно
+- Перед инстанциацией все параметры шаблона должны быть известны
+- Компилятор может вывести эти параметры из аргументов, если это можно сделать однозначно
 
 ## Шаблоны функций
 
@@ -82,26 +80,20 @@ int main() {
 ```cpp
 int main() {
     std::cout << max(100500, 1005001) << std::endl;
-```
 
-- /*
-```cpp
+    /* Возможная инстанциация для int:
 const int& max(const int& a, const int& b) {
     return a > b ? a : b;
 }
-```
+    */
 
-- */
-```cpp
-std::cout << max(100.500, 100.501)
-          << std::endl;  // const double& max(const double&, const double&) {.....}
-std::cout << max("def", "abc")
-          << std::endl;  // const char[4]& max(const char[4]&,  const char[4]&) {..}
+    std::cout << max(100.500, 100.501) << std::endl;
+    std::cout << max("def", "abc") << std::endl;
 
-// std::cout << max(10, 20.2) << std::endl;   // error: no matching function for call to 'max'
+    // max(10, 20.2); // error: no matching function
 
-std::cout << max<double>(10, 20.2) << std::endl;
-std::cout << max<std::string>("def", "abc") << std::endl;
+    std::cout << max<double>(10, 20.2) << std::endl;
+    std::cout << max<std::string>("def", "abc") << std::endl;
 }
 ```
 
@@ -126,7 +118,7 @@ int main() {
 
 
 - Без инстанциации не происходит генерации конкретного шаблона
-- При использовании шаблонной функции или класса, требуется полно определение, поэтому для использования в других единицах трансляции шаблоны требуется определять в заголовочных файлах
+- При использовании шаблонной функции или класса требуется полное определение, поэтому шаблоны обычно определяют в заголовочных файлах
 - Шаблон генерирует “настоящий” класс или функцию
 - Явная и неявная инстанциация
 
@@ -150,14 +142,8 @@ template <typename T1, typename T2>
 class CPair {
    public:
     CPair() = default;
-```
-
-- CPair(const T1& first, const T2& second)
-- : first_{first}
-- , second_{second}
-```cpp
-{
-}
+    CPair(const T1& first, const T2& second) : first_{first}, second_{second} {
+    }
 ```
 
 ## Шаблон класса
@@ -218,10 +204,7 @@ int main() {
     CPair<float, float> p4;
 
     p3 = p1;
-```
-
-- p4 = p1 // Error
-```cpp
+    p4 = p1  // Error
 }
 ```
 
@@ -233,18 +216,13 @@ template <typename T1, typename T2>
 class CPair {
    public:
     template <class U1, class U2>
-```
+    CPair& operator=(const CPair<U1, U2>& other) {
+        first_ = static_cast<T1>(other.first());
+        second_ = static_cast<T2>(other.second());
 
-- CPair&operator=(const CPair<U1, U2>& other) {
-```cpp
-first_ = static_cast<T1>(other.first());
-second_ = static_cast<T2>(other.second());
-
-return *this;
-}
-;
-}
-;
+        return *this;
+    };
+};
 ```
 
 ## Class template argument deduction (CTAD)
@@ -267,7 +245,7 @@ int main() {
 ## Non-type template parameter
 
 
-- Константные выражения (интегральных типов, энумов)
+- Константные выражения целочисленных типов и перечислений
 - Указатели (на объект, функцию, член класса)
 ```cpp
 std::nullptr_t
@@ -282,25 +260,23 @@ std::nullptr_t
 template <typename T, size_t SIZE>
 class CArray {
    public:
-```
+    `T& operator[](size_t index) {
+        return arr[index];
+    }
+    ` const T& operator[](size_t index) const {
+        return arr[index];
+    }
 
-- `T& operator[](size_t index) { return arr[index]; }`
-```cpp
-const T& operator[](size_t index) const {
-    return arr[index];
-}
+    bool empty() const {
+        return SIZE == 0;
+    }
+    size_t size() const {
+        return SIZE;
+    }
 
-bool empty() const {
-    return SIZE == 0;
-}
-size_t size() const {
-    return SIZE;
-}
-
-private:
-T arr[SIZE];
-}
-;
+   private:
+    T arr[SIZE];
+};
 ```
 
 ## Аргументы по умолчанию
@@ -309,25 +285,17 @@ T arr[SIZE];
 ```cpp
 template <class T>
 struct greater {
-```
-
-- bool operator()(const T& a, const T& b) const {
-```cpp
-return a > b;
-}
-}
-;
+    bool operator()(const T& a, const T& b) const {
+        return a > b;
+    }
+};
 
 template <class T>
 struct less {
-```
-
-- bool operator()(const T& a, const T& b) const {
-```cpp
-return a < b;
-}
-}
-;
+    bool operator()(const T& a, const T& b) const {
+        return a < b;
+    }
+};
 ```
 
 - NB! Функторы
@@ -337,17 +305,14 @@ return a < b;
 
 ```cpp
 template <class T, class cmp_t = less<T>>
-```
+void bubble_sort(T* begin, T* end, cmp_t cmp = cmp_t()) {
+    size_t count = end - begin;
 
-- void buble_sort(T* begin, T* end, cmp_t cmp = cmp_t()) {
-```cpp
-size_t count = end - begin;
-
-for (size_t i = 0; i < count; ++i) {
-    for (size_t j = 0; j < count - i - 1; ++j) {
-        if (!cmp(begin[j], begin[j + 1])) std::swap(begin[j], begin[j + 1]);
+    for (size_t i = 0; i < count; ++i) {
+        for (size_t j = 0; j < count - i - 1; ++j) {
+            if (!cmp(begin[j], begin[j + 1])) std::swap(begin[j], begin[j + 1]);
+        }
     }
-}
 }
 ```
 

@@ -6,8 +6,6 @@ title: "Лекция 15. Обработка ошибок"
 
 [Открыть слайды](slides/15-error-handling.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1bXINre3KdxlpR7y4xLp6ecdY1Afrve-Xyje6W44NacY/edit)
-
 :::
 
 ## Язык С++
@@ -28,15 +26,15 @@ title: "Лекция 15. Обработка ошибок"
 ## Assert
 
 
-```cpp
-#include <cassert>
-
-int main() {
-    assert(2 + 2 == 4);
-    assert(2 + 2 == 5);
-    return 0;
-}
+```{.cpp filename="assert-failure.cpp"}
+{{< include examples/15-error-handling/assert-failure.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-15-assert-failure]{aria-label="Open in Compiler Explorer"}
+
+Второй `assert` намеренно завершает программу с ошибкой.
+
+
 
 - int main(): Assertion `2+2 == 5' failed.
 
@@ -48,26 +46,18 @@ static_assert(sizeof(int) == 4, "int must be 4 bytes");
 
 template <typename T>
 struct data_structure {
-```
+    static_assert(std::is_default_constructible<T>::value,
+                  "Data Structure requires default-constructible elements");
+};
 
-- static_assert(
-```cpp
-std::is_default_constructible<T>::value,
-```
+struct no_default {
+    no_default() = delete;
+};
 
-- "Data Structure requires default-constructible elements"
-```cpp
-   );
-   }
-   ;
-   struct no_default {
-       no_default() = delete;
-   };
-
-   int main() {
-       data_structure<no_default> ds_error;
-       return 0;
-   }
+int main() {
+    data_structure<no_default> ds_error;
+    return 0;
+}
 ```
 
 ## Код возврата
@@ -76,15 +66,9 @@ std::is_default_constructible<T>::value,
 - // количество успешно записанных
 ```cpp
 size_t fwrite(const void* buffer, size_t size, size_t count, FILE* stream);
-```
-
-- // errno
-```cpp
+// errno
 FILE* fopen(const char* filename, const char* mode);
-```
-
-- // ошибка в качестве кода возврата
-```cpp
+// ошибка в качестве кода возврата
 errno_t fopen_s(FILE* restrict* restrict streamptr, const char* restrict filename,
                 const char* restrict mode);
 ```
@@ -98,24 +82,15 @@ errno_t fopen_s(FILE* restrict* restrict streamptr, const char* restrict filenam
 int main() {
     FILE* file = fopen("test.tmp", "w");
     if (!file) {
-```
-
-- // do something
-```cpp
-}
-if (fprintf(file, "Hello") < 0 || printf(file, "World") < 0) {
-```
-
-- // do something
-```cpp
-}
-if (fclose(file) == EOF) {
-```
-
-- // do something
-```cpp
-}
-return 0;
+        // do something
+    }
+    if (fprintf(file, "Hello") < 0 || printf(file, "World") < 0) {
+        // do something
+    }
+    if (fclose(file) == EOF) {
+        // do something
+    }
+    return 0;
 }
 ```
 
@@ -146,13 +121,10 @@ int main(int, char**) {
 ## Stack unwinding
 
 
-- Сконструированный объект пробрасывается обратно по стэку
-- До встречи подходящего блока try\catch
-- “Раскручивая” стэк обратно уничтожаются все объекты с automatic storage duration (!NB Если исключение не перехватывается, то stack unwinding зависит от реализации )
-```cpp
-std::terminate если в процессе возникает еще одно исключение
-```
-
+- Сконструированный объект передаётся обратно по стеку
+- До встречи подходящего блока `try`/`catch`
+- При раскрутке стека уничтожаются объекты с automatic storage duration
+- Если во время раскрутки стека из деструктора выходит ещё одно исключение, вызывается `std::terminate`
 - Деструктор noexcept
 - Сам объект хранится в неопределенном участке памяти
 
@@ -191,29 +163,14 @@ int main() {
     try {
         foo();
     } catch (const std::overflow_error& e) {
-```
-
-- // do somethisg
-```cpp
-}
-catch (const std::runtime_error& e) {
-```
-
-- // do somethisg
-```cpp
-}
-catch (const std::exception& e) {
-```
-
-- // do somethisg
-```cpp
-}
-catch (...) {
-```
-
-- // do somethisg
-```cpp
-}
+        // do something
+    } catch (const std::runtime_error& e) {
+        // do something
+    } catch (const std::exception& e) {
+        // do something
+    } catch (...) {
+        // do something
+    }
 ```
 
 ## Гарантии безопасности исключений
@@ -236,23 +193,12 @@ catch (...) {
 ```cpp
 struct Foo {
     int value;
-```
-
-- Foo(int v)
-- : value(v)
-```cpp
-{
-}
-```
-
-- Foo(const Foo& other)
-- : value(other.value)
-```cpp
-{
-    if (something) throw std::runtime_error("KEKW");
-}
-}
-;
+    Foo(int v) : value(v) {
+    }
+    Foo(const Foo& other) : value(other.value) {
+        if (something) throw std::runtime_error("KEKW");
+    }
+};
 ```
 
 - Конструктор может кинуть исключение
@@ -267,23 +213,17 @@ class Boo {
     int value_ = 0;
 
    public:
-    Boo(int value = 0) : value_(value) {}
-```
+    Boo(int value = 0) : value_(value) {
+    }
+    Boo(int value, int foo_value) : foo_(new Foo{foo_value}), value_(value) {
+    }
 
-- Boo(int value, int foo_value)
-- : foo_(new Foo{foo_value})
-- , value_(value)
-```cpp
-{
-}
+    ~Boo() {
+        delete foo_;
+    }
 
-~Boo() {
-    delete foo_;
-}
-
-friend std::ostream& operator<<(std::ostream& stream, const Boo& value);
-}
-;
+    friend std::ostream& operator<<(std::ostream& stream, const Boo& value);
+};
 ```
 
 ## No guarantee
@@ -355,13 +295,9 @@ Boo& operator=(const Boo& other) {
     if (this == &other) return *this;
 
     value_ = other.value_;
-```
+    foo_.release() if (other.foo_) foo_ = std::make_unique<Foo>(*other.foo_);
 
-- foo_.release()
-```cpp
-if (other.foo_) foo_ = std::make_unique<Foo>(*other.foo_);
-
-return *this;
+    return *this;
 }
 ```
 
@@ -379,12 +315,9 @@ Boo& operator=(const Boo& other) {
 
     return *this;
 }
-```
-
-- void swap(Boo& other) noexcept {
-```cpp
-std::swap(value_, other.value_);
-std::swap(foo_, other.foo_);
+void swap(Boo& other) noexcept {
+    std::swap(value_, other.value_);
+    std::swap(foo_, other.foo_);
 }
 ```
 
@@ -411,25 +344,19 @@ Boo& operator=(Boo&&) noexcept = default;
 ## noexcept
 
 
-- Гарантирует что функция не будет бросать исключения
-- Не сворачивает стэк
+- Сообщает, что исключение не должно покинуть функцию
+- Если исключение покидает `noexcept`-функцию, вызывается `std::terminate`
+- `throw` внутри функции возможен, если исключение будет перехвачено до выхода
 - Позволяет компилятору лучше оптимизировать код
-```cpp
-std::terminate
-```
-
-- Деструктор noexcept  по умолчанию
+- Деструктор `noexcept` по умолчанию
 
 ## std::exception
 
 
 - Кидать стандартные типы в качестве исключений - малоинформативно
 - Исключение должно нести информацию о случившемся событии
-```cpp
-std::exception - базовый класс для исключений стандартной библиотеки
-```
-
-- Тип эксепшена также является полезной информацией
+- `std::exception` — базовый класс для исключений стандартной библиотеки
+- Тип исключения также является полезной информацией
 
 ## std::exception
 
@@ -458,7 +385,8 @@ class exception {
 ```cpp
 class my_exception : public std::exception {  // derived from std::exception
    public:
-    my_exception(const std::string& what) : what_(what) {}
+    my_exception(const std::string& what) : what_(what) {
+    }
     const char* what() const noexcept override {
         return what_.c_str();
     }
@@ -490,8 +418,8 @@ int main(int, char**) {
 
 
 - Исключения предназначены исключительно для обработки ошибок
-- Обработки ошибок должна строиться вокруг инварианта объекта
-- Исключения принято кидать по-значению, а ловить по-ссылку
+- Обработка ошибок должна строиться вокруг инварианта объекта
+- Исключения принято бросать по значению, а ловить по ссылке
 
 ## Exception cost
 
@@ -513,26 +441,22 @@ void do_sqrt(std::span<double> values) {
 
 - Proposal P2544R0
 
-## std::expected
+## `std::expected` (C++23)
 
 
 ```cpp
 enum class EDivError {
-```
-
-- DevisionByZero = 0,
-```cpp
-}
-;
+    DivisionByZero = 0,
+};
 
 std::expected<int, EDivError> my_div(int a, int b) {
-    if (b == 0) return std::unexpected{EDivError::DevisionByZero};
+    if (b == 0) return std::unexpected{EDivError::DivisionByZero};
 
     return a / b;
 }
 ```
 
-## std::expected
+## `std::expected` (C++23)
 
 
 ```cpp
@@ -542,7 +466,7 @@ int main() {
 
     try {
         std::cout << r.value() << std::endl;
-    } catch (std::bad_expected_access<EDivError>& err) {
+    } catch (const std::bad_expected_access<EDivError>& err) {
         std::cout << err.what() << std::endl;
     }
 
@@ -550,24 +474,22 @@ int main() {
 }
 ```
 
-## std::expected (C++ 23)
+## `std::expected` (C++23)
 
 
 - Позволяет возвращать либо ожидаемое значение либо ошибку
 - Накладные расходы сравнимы с кодом возврата
-- Передает ответственность за обработку вызывающему коду
-```cpp
-std::expected<T, E> std::unexpected<E> std::bad_expected_access
-```
+- Передаёт ответственность за обработку вызывающему коду
+- `std::expected<T, E>` хранит результат или ошибку
+- `std::unexpected<E>` передаёт ошибку
+- `std::bad_expected_access<E>` возникает при некорректном вызове `value()`
 
 ## Исключения и код возврата
 
 
 - Исключения позволяют обрабатывать ошибки единообразно, но не в месте возникновения
-- Коды возврата позволяют обработать ошибку сразу при возникновении но не единообразно
-```cpp
-std::expected позволяет иметь комбинированный подход
-```
+- Коды возврата позволяют обработать ошибку сразу при возникновении, но не единообразно
+- `std::expected` сочетает явную проверку результата с типизированной ошибкой
 
 ## Исключения и код возврата
 
@@ -639,23 +561,24 @@ uint32_t to_uint(std::string_view str) {
 
 ```cpp
 bool to_uint(std::string_view str, uint32_t& result) {
-    if (str.empty()) return false;
+    if (str.empty()) {
+        return false;
+    }
 
     for (char c : str) {
-        if (c < '0' || c > '9') 
+        if (c < '0' || c > '9') {
+            return false;
+        }
+
+        result *= 10;
+        result += c - '0';
+    }
+
+    return true;
+}
 ```
 
-- <stdlib.h>
-```cpp
-result *= 10;
-result += c - '0';
-}
-
-return true;
-}
-```
-
-- Лучше, но не отвечает на вопрос что случилось
+- Лучше, но не отвечает на вопрос, что случилось
 
 ## Исключения и код возврата
 
@@ -682,7 +605,7 @@ uint32_t to_uint(std::string_view str) {
 ```
 
 - Решает проблему в стиле С
-- через erron
+- через `errno`
 
 ## Исключения и код возврата
 
@@ -734,7 +657,7 @@ std::optional<uint32_t> to_uint(std::string_view str) {
 std::expected<uint32_t, std::invalid_argument> to_uint(std::string_view str) {
     if (str.empty()) return std::unexpected{std::invalid_argument("String is empty")};
 
-    uint32_t result;
+    uint32_t result = 0;
 
     for (char c : str) {
         if (c < '0' || c > '9')
@@ -747,6 +670,9 @@ std::expected<uint32_t, std::invalid_argument> to_uint(std::string_view str) {
 
     return result;
 }
-
-Использует std::expected
 ```
+
+- Использует `std::expected`
+
+[godbolt-15-assert-failure]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ccassert%3E%0A%0Aint+main()+%7B%0A++++assert(2+%2B+2+%3D%3D+4)%3B%0A++++assert(2+%2B+2+%3D%3D+5)%3B++//+%D0%9D%D0%B0%D0%BC%D0%B5%D1%80%D0%B5%D0%BD%D0%BD%D0%BE%D0%B5+%D0%B7%D0%B0%D0%B2%D0%B5%D1%80%D1%88%D0%B5%D0%BD%D0%B8%D0%B5+%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D1%8B.%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/15-error-handling/assert-failure.cpp" compiler="clang2310" options="-std=c++20 -O0" -->

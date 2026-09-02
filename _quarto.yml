@@ -1,6 +1,8 @@
 project:
   type: website
   output-dir: _site
+  pre-render:
+    - node scripts/update-godbolt-links.mjs
   render:
     - "*.md"
     - "!template.md"

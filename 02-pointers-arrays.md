@@ -6,8 +6,6 @@ title: "Лекция 2. Указатели, массивы и строки"
 
 [Открыть слайды](slides/02-pointers-arrays.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1kZ238rxAW6KVKxkX4p2x0dyiPRsZRtL9_NEruCbfhcI/edit)
-
 :::
 
 В этой лекции рассматриваются адреса памяти и работа с ними в C++. Мы разберём, как устроены указатели, почему массивы тесно связаны с адресной арифметикой, как представлены C-строки и как передавать функции через указатели.
@@ -56,18 +54,11 @@ pointer = &values[0];
 
 Указатель тоже является объектом и имеет собственный адрес. Поэтому выражения `pointer` и `&pointer` обозначают разные значения:
 
-```cpp
-#include <iostream>
-
-int main() {
-    int value = 10;
-    int* pointer = &value;
-
-    std::cout << "Адрес value: " << &value << '\n';
-    std::cout << "Значение pointer: " << pointer << '\n';
-    std::cout << "Адрес pointer: " << &pointer << '\n';
-}
+```{.cpp filename="pointer-addresses.cpp"}
+{{< include examples/02-pointers-arrays/pointer-addresses.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-02-pointer-addresses]{aria-label="Open in Compiler Explorer"}
 
 Первые два адреса будут одинаковыми: `pointer` указывает на `value`. Третий адрес относится к ячейке, в которой хранится сам указатель.
 
@@ -75,20 +66,11 @@ int main() {
 
 Размер объекта зависит от его типа, но размер указателя обычно определяется архитектурой процесса. Поэтому `bool*` и `long*` в одной программе, как правило, имеют одинаковый размер:
 
-```cpp
-#include <iostream>
-
-int main() {
-    bool flag = true;
-    long number = 128L;
-
-    bool* flag_pointer = &flag;
-    long* number_pointer = &number;
-
-    std::cout << sizeof(flag) << ' ' << sizeof(number) << '\n';
-    std::cout << sizeof(flag_pointer) << ' ' << sizeof(number_pointer) << '\n';
-}
+```{.cpp filename="pointer-sizes.cpp"}
+{{< include examples/02-pointers-arrays/pointer-sizes.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-02-pointer-sizes]{aria-label="Open in Compiler Explorer"}
 
 На распространённой 64-битной платформе оба указателя обычно занимают 8 байт. Стандарт C++ не фиксирует это значение, поэтому полагаться на конкретный размер без проверки не следует.
 
@@ -96,21 +78,11 @@ int main() {
 
 Если объектом по адресу является другой указатель, появляется дополнительный уровень косвенного доступа:
 
-```cpp
-#include <iostream>
-
-int main() {
-    int value = 0;
-    int* pointer = &value;
-    int** pointer_to_pointer = &pointer;
-    int*** third_level = &pointer_to_pointer;
-
-    std::cout << value << '\n';
-    std::cout << *pointer << '\n';
-    std::cout << **pointer_to_pointer << '\n';
-    std::cout << ***third_level << '\n';
-}
+```{.cpp filename="multi-level-pointers.cpp"}
+{{< include examples/02-pointers-arrays/multi-level-pointers.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-02-multi-level-pointers]{aria-label="Open in Compiler Explorer"}
 
 Во всех четырёх случаях читается один объект `value`. Каждая звёздочка снимает один уровень указателя.
 
@@ -118,25 +90,11 @@ int main() {
 
 В современном C++ для нулевого указателя следует использовать `nullptr`. Это отдельный литерал типа `std::nullptr_t`, который не смешивается с целыми числами при выборе перегруженной функции.
 
-```cpp
-#include <cstddef>
-#include <iostream>
-
-void Print(int*) {
-    std::cout << "Print(int*)\n";
-}
-
-void Print(int) {
-    std::cout << "Print(int)\n";
-}
-
-int main() {
-    Print(nullptr);  // Print(int*)
-    Print(0);        // Print(int)
-
-    // Print(NULL);  // Может быть неоднозначно: NULL обычно является макросом.
-}
+```{.cpp filename="nullptr-overload.cpp"}
+{{< include examples/02-pointers-arrays/nullptr-overload.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-02-nullptr-overload]{aria-label="Open in Compiler Explorer"}
 
 `NULL` исторически использовался в C и старом C++, но чаще всего раскрывается в целочисленную константу. В новом коде предпочтителен `nullptr`.
 
@@ -154,23 +112,11 @@ void SwapValues(int left, int right) {
 
 Чтобы изменить объекты вызывающего кода, можно передать их адреса:
 
-```cpp
-#include <iostream>
-
-void Swap(int* left, int* right) {
-    int temporary = *left;
-    *left = *right;
-    *right = temporary;
-}
-
-int main() {
-    int first = 1;
-    int second = 2;
-
-    Swap(&first, &second);
-    std::cout << first << ' ' << second << '\n';  // 2 1
-}
+```{.cpp filename="swap-through-pointers.cpp"}
+{{< include examples/02-pointers-arrays/swap-through-pointers.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-02-swap-pointers]{aria-label="Open in Compiler Explorer"}
 
 ![Передача адресов переменных в функцию Swap](assets/02-pointers-arrays/slide-10-image-01.png)
 
@@ -321,15 +267,11 @@ int StringCompare(const char* first, const char* second) {
 
 В традиционной форме `main` получает количество аргументов и массив указателей на строки:
 
-```cpp
-#include <iostream>
-
-int main(int argc, char* argv[]) {
-    for (int index = 0; index < argc; ++index) {
-        std::cout << argv[index] << '\n';
-    }
-}
+```{.cpp filename="command-line-arguments.cpp"}
+{{< include examples/02-pointers-arrays/command-line-arguments.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-02-command-line]{aria-label="Open in Compiler Explorer"}
 
 `argc` содержит количество аргументов, а `argv[index]` указывает на C-строку с соответствующим аргументом.
 
@@ -390,19 +332,11 @@ int main() {
 
 Адрес можно получить не только у объекта, но и у функции. Тип указателя содержит тип возвращаемого значения и типы параметров:
 
-```cpp
-int Same(int value) {
-    return value;
-}
-
-int main() {
-    int (*function)(int) = Same;
-    int (*same_function)(int) = &Same;
-
-    function(2);
-    same_function(2);
-}
+```{.cpp filename="function-pointers.cpp"}
+{{< include examples/02-pointers-arrays/function-pointers.cpp >}}
 ```
+
+[![](assets/compiler-explorer.svg){.godbolt-link-image width="32"}][godbolt-02-function-pointers]{aria-label="Open in Compiler Explorer"}
 
 Амперсанд при присваивании адреса функции необязателен: `Same` и `&Same` дают подходящий указатель.
 
@@ -472,3 +406,24 @@ int main() {
 5. Почему строковые литералы следует хранить через `const char*`?
 6. Почему `void*` нельзя разыменовать без приведения типа?
 7. Из каких частей состоит тип указателя на функцию?
+
+[godbolt-02-pointer-addresses]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Aint+main()+%7B%0A++++int+value+%3D+10%3B%0A++++int*+pointer+%3D+%26value%3B%0A%0A++++std::cout+%3C%3C+%22%D0%90%D0%B4%D1%80%D0%B5%D1%81+value:+%22+%3C%3C+%26value+%3C%3C+!'%5Cn!'%3B%0A++++std::cout+%3C%3C+%22%D0%97%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5+pointer:+%22+%3C%3C+pointer+%3C%3C+!'%5Cn!'%3B%0A++++std::cout+%3C%3C+%22%D0%90%D0%B4%D1%80%D0%B5%D1%81+pointer:+%22+%3C%3C+%26pointer+%3C%3C+!'%5Cn!'%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/02-pointers-arrays/pointer-addresses.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-02-pointer-sizes]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Aint+main()+%7B%0A++++bool+flag+%3D+true%3B%0A++++long+number+%3D+128L%3B%0A%0A++++bool*+flag_pointer+%3D+%26flag%3B%0A++++long*+number_pointer+%3D+%26number%3B%0A%0A++++std::cout+%3C%3C+sizeof(flag)+%3C%3C+!'+!'+%3C%3C+sizeof(number)+%3C%3C+!'%5Cn!'%3B%0A++++std::cout+%3C%3C+sizeof(flag_pointer)+%3C%3C+!'+!'+%3C%3C+sizeof(number_pointer)+%3C%3C+!'%5Cn!'%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/02-pointers-arrays/pointer-sizes.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-02-multi-level-pointers]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Aint+main()+%7B%0A++++int+value+%3D+0%3B%0A++++int*+pointer+%3D+%26value%3B%0A++++int**+pointer_to_pointer+%3D+%26pointer%3B%0A++++int***+third_level+%3D+%26pointer_to_pointer%3B%0A%0A++++std::cout+%3C%3C+value+%3C%3C+!'%5Cn!'%3B%0A++++std::cout+%3C%3C+*pointer+%3C%3C+!'%5Cn!'%3B%0A++++std::cout+%3C%3C+**pointer_to_pointer+%3C%3C+!'%5Cn!'%3B%0A++++std::cout+%3C%3C+***third_level+%3C%3C+!'%5Cn!'%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/02-pointers-arrays/multi-level-pointers.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-02-nullptr-overload]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Avoid+print(int*)+%7B%0A++++std::cout+%3C%3C+%22print(int*)%5Cn%22%3B%0A%7D%0A%0Avoid+print(int)+%7B%0A++++std::cout+%3C%3C+%22print(int)%5Cn%22%3B%0A%7D%0A%0Aint+main()+%7B%0A++++print(nullptr)%3B%0A++++print(0)%3B%0A%0A++++//+print(NULL)%3B+//+%D0%9C%D0%BE%D0%B6%D0%B5%D1%82+%D0%B1%D1%8B%D1%82%D1%8C+%D0%BD%D0%B5%D0%BE%D0%B4%D0%BD%D0%BE%D0%B7%D0%BD%D0%B0%D1%87%D0%BD%D0%BE:+NULL+%D0%BE%D0%B1%D1%8B%D1%87%D0%BD%D0%BE+%D1%8F%D0%B2%D0%BB%D1%8F%D0%B5%D1%82%D1%81%D1%8F+%D0%BC%D0%B0%D0%BA%D1%80%D0%BE%D1%81%D0%BE%D0%BC.%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/02-pointers-arrays/nullptr-overload.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-02-swap-pointers]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Avoid+swap_values(int*+left,+int*+right)+%7B%0A++++int+temporary+%3D+*left%3B%0A++++*left+%3D+*right%3B%0A++++*right+%3D+temporary%3B%0A%7D%0A%0Aint+main()+%7B%0A++++int+first+%3D+1%3B%0A++++int+second+%3D+2%3B%0A%0A++++swap_values(%26first,+%26second)%3B%0A++++std::cout+%3C%3C+first+%3C%3C+!'+!'+%3C%3C+second+%3C%3C+!'%5Cn!'%3B%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/02-pointers-arrays/swap-through-pointers.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-02-command-line]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'%23include+%3Ciostream%3E%0A%0Aint+main(int+argc,+char*+argv%5B%5D)+%7B%0A++++for+(int+index+%3D+0%3B+index+%3C+argc%3B+%2B%2Bindex)+%7B%0A++++++++std::cout+%3C%3C+argv%5Bindex%5D+%3C%3C+!'%5Cn!'%3B%0A++++%7D%0A%0A++++return+0%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/02-pointers-arrays/command-line-arguments.cpp" compiler="clang2310" options="-std=c++20 -O0" -->
+
+[godbolt-02-function-pointers]: <https://godbolt.org/#g:!((g:!((h:codeEditor,i:(j:1,lang:c%2B%2B,options:(compileOnChange:'0'),source:'int+same(int+value)+%7B%0A++++return+value%3B%0A%7D%0A%0Aint+main()+%7B%0A++++int+(*function)(int)+%3D+same%3B%0A++++int+(*same_function)(int)+%3D+%26same%3B%0A%0A++++return+function(2)+%2B+same_function(2)+%3D%3D+4+%3F+0+:+1%3B%0A%7D%0A'),l:'5'),(h:executor,i:(compilationPanelShown:'0',compiler:clang2310,compilerOutShown:'0',lang:c%2B%2B,libs:!(),options:'-std%3Dc%2B%2B20+-O0',source:1,tree:0),l:'5')),l:'2')),version:4>
+<!-- godbolt source="examples/02-pointers-arrays/function-pointers.cpp" compiler="clang2310" options="-std=c++20 -O0" -->

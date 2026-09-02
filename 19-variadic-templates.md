@@ -6,8 +6,6 @@ title: "Лекция 19. Вариативные шаблоны"
 
 [Открыть слайды](slides/19-variadic-templates.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1HXBBKpFkJ6zpzToUNHf9nhwnDq5MwL0Uwd-6VlJO-f4/edit)
-
 :::
 
 ## Язык С++
@@ -27,7 +25,7 @@ std::string to_string(const T& value) {
 }
 ```
 
-## Variadic template (C++ 11)
+## Variadic template (C++11)
 
 
 ```cpp
@@ -71,12 +69,9 @@ std::vector<std::string> to_strings(const T& value, const TArgs&... args) {
 template <typename T, typename... TArgs>
 void printAll(const T& v, const TArgs&... args) {
     std::cout << v << " ";
-```
-
-- if constexpr(sizeof...(args) > 0) {
-```cpp
-printAll(args...);
-}
+    if constexpr (sizeof...(args) > 0) {
+        printAll(args...);
+    }
 }
 ```
 
@@ -85,7 +80,7 @@ printAll(args...);
 - sizeof…  operator - queries the number of elements in a parameter pack
 - Parameter pack expansion
 
-## Fold-expression (C++ 17)
+## Fold-expression (C++17)
 
 
 ```cpp
@@ -95,7 +90,7 @@ std::vector<std::string> to_strings(const TArgs&... args) {
 }
 ```
 
-## Fold-expression (C++ 17)
+## Fold-expression (C++17)
 
 
 ```cpp
@@ -111,7 +106,7 @@ std::vector<std::string> to_strings(const TArgs&... args) {
 - Binary right fold (E op ... op I) becomes (E1 op (... op (EN−1 op (EN op I))))
 - Binary left fold (I op ... op E) becomes ((((I op E1) op E2) op ...) op EN)
 
-## Fold-expression (C++ 17)
+## Fold-expression (C++17)
 
 
 ```cpp
@@ -157,11 +152,10 @@ struct NaiveTuple;
 
 template <>
 struct NaiveTuple<> {};
-
-Простая реализация класса std::tuple
 ```
 
-- Используется та же идея рекурсии только через параметры шаблона класса
+- Упрощённая реализация класса `std::tuple`
+- Используется та же идея рекурсии, но через параметры шаблона класса
 
 ## Tuple
 
@@ -177,19 +171,13 @@ template <typename Head, typename... Tail>
 struct NaiveTuple<Head, Tail...> : NaiveTuple<Tail...> {
     using Base = NaiveTuple<Tail...>;
     using value_type = Head;
-```
 
-- NaiveTuple(const Head& h, const Tail&... tail)
-- : NaiveTuple<Tail...>(tail...)
-- , head(h)
-```cpp
-{
-}
+    NaiveTuple(const Head& value, const Tail&... tail) : Base(tail...), head(value) {
+    }
 
-Base& base = static_cast<Base&>(*this);
-Head head;
-}
-;
+    Base& base = static_cast<Base&>(*this);
+    Head head;
+};
 ```
 
 ## Tuple
@@ -249,22 +237,14 @@ NaiveTuple<TArgs...> make_tuple(TArgs... args) {
 
 
 - Class Template Argument Deduction (CTAD)
-- Нет возможности вывести тип класса если аргументы с ним не связаны
+- Нельзя вывести тип класса, если аргументы с ним не связаны
 ```cpp
 std::array<int, 5> arr = {1, 2, 3, 4, 5};
 std::vector v(arr.begin(), arr.end());
-```
-
-- ///////// from vector implemplementation
-```cpp
+///////// from vector implementation
 template <class _InputIterator, class _Alloc = allocator<__iter_value_type<_InputIterator>>,
-          class = _EnableIf<__is_allocator<_Alloc>::value>
-```
-
-- >
-- vector(_InputIterator, _InputIterator)
-```cpp
-->vector<__iter_value_type<_InputIterator>, _Alloc>;
+          class = _EnableIf<__is_allocator<_Alloc>::value>>
+vector(_InputIterator, _InputIterator) -> vector<__iter_value_type<_InputIterator>, _Alloc>;
 ```
 
 ## Overload pattern
@@ -280,7 +260,7 @@ template <typename... Ts>
 Overload(Ts...) -> Overload<Ts...>;
 ```
 
-- Такой же класс но, но с конечным числом базовых мы уже реализовывали когда говорили по лямбды
+- Похожий класс с конечным числом базовых мы уже реализовывали, когда говорили о лямбдах
 
 ## Overload pattern
 
@@ -288,14 +268,10 @@ Overload(Ts...) -> Overload<Ts...>;
 ```cpp
 template <typename T>
 struct Foo {
-```
-
-- void operator()(const T& value ) {
-```cpp
-std::cout << "Foo::operator()";
-}
-}
-;
+    void operator()(const T& value) {
+        std::cout << "Foo::operator()";
+    }
+};
 
 int main(int, char**) {
     auto overload = Overload{[](char) { std::cout << "char"; }, [](int) { std::cout << "int"; },
@@ -362,7 +338,8 @@ class FutureC {};
 template <template <typename> typename... Futures>
 class Foo : public Futures<Foo<Futures...>>... {
    public:
-    void Do() {}
+    void Do() {
+    }
 };
 
 using FooAB = Foo<FutureA, FutureB, FutureC>;

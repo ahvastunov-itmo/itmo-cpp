@@ -1,7 +1,5 @@
 # Шаблон
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1mPb50oTLj9zLVLyHjEKU_yoRAex95KhNb5YZRsIaOH0/edit)
-
 ## Слайд 1
 
 
@@ -24,5 +22,4 @@
 
 
 ## Слайд 8
-
 

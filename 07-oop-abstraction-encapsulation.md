@@ -6,8 +6,6 @@ title: "Лекция 7. Абстракция и инкапсуляция"
 
 [Открыть слайды](slides/07-oop-abstraction-encapsulation.html){.btn .btn-outline-primary target="_blank"}
 
-> Источник: [Google Slides](https://docs.google.com/presentation/d/1evl7GwIw51ynhoAWkI9c-OAtRlEOiZvtLAkwCdzvpEM/edit)
-
 :::
 
 ## Язык С++
@@ -21,7 +19,7 @@ title: "Лекция 7. Абстракция и инкапсуляция"
 - Абстракция
 - Инкапсуляция
 - Наследование
-- Полиформизм
+- Полиморфизм
 
 ## Абстракция
 
@@ -66,11 +64,8 @@ SStack createStack();
 ```cpp
 int main() {
     SStack stack = createStack();
-```
-
-- stack.size = 100500;   // OOps
-- stack.arr = NULL;      // OOps
-```cpp
+    stack.size = 100500;  // OOps
+    stack.arr = NULL;     // OOps
 }
 ```
 
@@ -87,10 +82,7 @@ struct Data {
     int32_t Year;
     int32_t Month;
     int32_t Day;
-```
-
-- int32_t timestemp; // seconds after January 1st, 1970
-```cpp
+    int32_t timestamp;  // seconds after January 1st, 1970
 }
 ```
 
@@ -104,7 +96,7 @@ Date CreateDate(int32_t year, int32_t month, int32_t day) {
     date.Year = year;
     date.Month = month;
     date.Day = day;
-    date.timestemp = (year - 1970) * 31556926 + month * 2629743 + day * 86400;
+    date.timestamp = (year - 1970) * 31556926 + month * 2629743 + day * 86400;
 
     return date;
 }
@@ -148,10 +140,7 @@ int main() {
 - private
 - protected
 - Вложенные классы
-```cpp
-static поля
-```
-
+- Статические поля
 - Перегрузка операторов
 - ……..
 
@@ -228,10 +217,7 @@ class CIntStack {
 
 ```cpp
 public:
-```
-
-- Data(int32_t year, Month month, uint8_t day); // need validate year + month + day
-```cpp
+Data(int32_t year, Month month, uint8_t day);  // need validate year + month + day
 int32_t Year() const;
 Month Month() const;
 uint8_t Day() const;
@@ -252,17 +238,14 @@ uint8_t day_;
 ```cpp
 class Date {
    public:
-```
+    Data(int32_t year, Month month, uint8_t day);  // need validate year + month + day
+    int32_t Year() const;
+    Month Month() const;
+    uint8_t Day() const;
+    uint32_t Timestamp() const;
 
-- Data(int32_t year, Month month, uint8_t day); // need validate year + month + day
-```cpp
-int32_t Year() const;
-Month Month() const;
-uint8_t Day() const;
-uint32_t Timestamp() const;
-
-private:
-uint32_t timestemp_;
+   private:
+    uint32_t timestamp_;
 }
 ```
 
@@ -277,10 +260,7 @@ uint32_t timestemp_;
 - private
 - protected
 - Вложенные классы
-```cpp
-static поля
-```
-
+- Статические поля
 - Перегрузка операторов
 - ……..
 
@@ -319,20 +299,14 @@ class CRational {
 ```cpp
 class CRational {
    public:
-```
+    CRational(int numerator = 0, unsigned denominator = 1)  // default constructor
+        : numerator_(numerator), denominator_(denominator) {
+    }
 
-- CRational(int numerator=0 , unsigned denominator=1) // default constructor
-- : numerator_(numerator)
-- , denominator_(denominator)
-```cpp
-{
-}
-
-private:
-int numerator_;
-unsigned denominator_;
-}
-;
+   private:
+    int numerator_;
+    unsigned denominator_;
+};
 ```
 
 - // CRational(5, 10) != CRational(1, 2)
@@ -340,7 +314,7 @@ unsigned denominator_;
 ## Constructor
 
 
-- CRational(int numerator=0 , unsigned denuminator=1) // default constructor
+- CRational(int numerator=0 , unsigned denominator=1) // default constructor
 - : numerator_(numerator)
 - , denominator_(denominator)
 ```cpp
@@ -349,21 +323,13 @@ unsigned denominator_;
     numerator_ /= gcd;
     denominator_ /= gcd;
 }
-```
-
-- CRational(const CRational& other)   // copy constructor
-- : numerator_(other.numerator_)
-- , denominator_(other.denominator_)
-```cpp
-{
+CRational(const CRational& other)  // copy constructor
+    : numerator_(other.numerator_), denominator_(other.denominator_) {
 }
-```
-
-- CRational(CFraction&& other)        // move constructor
-```cpp
-       : numerator_(std::exchange(other.numerator_, 0))
-       , denominator_(std::exchange(other.denominator_, 0))
-   {}
+CRational(CFraction&& other)  // move constructor
+    : numerator_(std::exchange(other.numerator_, 0)),
+      denominator_(std::exchange(other.denominator_, 0)) {
+}
 ```
 
 ## Method
@@ -385,11 +351,8 @@ unsigned denominator() const {
 
 ```cpp
 int numerator() const {
-```
-
-- denominator_ = 1;  // compile-time error
-```cpp
-return numerator_;
+    denominator_ = 1;  // compile-time error
+    return numerator_;
 }
 ```
 
@@ -398,10 +361,7 @@ return numerator_;
 
 ```cpp
 ~CRational() {
-```
-
-- // erase resources if needed
-```cpp
+    // erase resources if needed
 }
 ```
 
@@ -424,24 +384,18 @@ CRational& operator=(const CRational& other) {
 
 ```cpp
 void PrintRational(const CRational& number) {
-    std::cout << number.numerator()
-```
-
-- << '/'
-- << number.denominator()
-```cpp
-   << std::endl;
+    std::cout << number.numerator() << '/' << number.denominator() << '\n';
 }
 
 int main() {
-   CRational value {5,10};
+    CRational value{5, 10};
 
-   PrintRational(value);
-   return 0;
+    PrintRational(value);
+    return 0;
 }
 ```
 
-- Более логично перегрузить оператор вывода (см след лекцию)
+- Более логично перегрузить оператор вывода (см. следующую лекцию)
 
 ## Default Constructor
 
@@ -465,27 +419,17 @@ int main() {
 ```cpp
 class GeoPoint {
    public:
-```
+    GeoPoint(const CRational& lat, const CRational& lon) : lat_(lat), lon_(lon) {
+    }
 
-- GeoPoint(const CRational& lat, const CRational& lon)
-- : lat_(lat)
-- , lon_(lon)
-```cpp
-{
-}
-
-private:
-CRational lat_;
-CRational lon_;
-}
-;
+   private:
+    CRational lat_;
+    CRational lon_;
+};
 
 int main() {
-```
-
-- GeoPoint p; // compile-time error
-```cpp
-return 0;
+    GeoPoint p;  // compile-time error
+    return 0;
 }
 ```
 
@@ -495,21 +439,15 @@ return 0;
 ```cpp
 class GeoPoint {
    public:
-    GeoPoint() {}
-```
+    GeoPoint() {
+    }
+    GeoPoint(const CRational& lat, const CRational& lon) : lat_(lat), lon_(lon) {
+    }
 
-- GeoPoint(const CRational& lat, const CRational& lon)
-- : lat_(lat)
-- , lon_(lon)
-```cpp
-{
-}
-
-private:
-CRational lat_;
-CRational lon_;
-}
-;
+   private:
+    CRational lat_;
+    CRational lon_;
+};
 
 int main() {
     GeoPoint p;
@@ -525,21 +463,15 @@ class GeoPoint {
    public:
     GeoPoint() = default;
     GeoPoint(const GeoPoint&) = delete;
-```
+    GeoPoint(const CRational& lat, const CRational& lon) : lat_(lat), lon_(lon) {
+    }
+    ~GeoPoint() {
+    }
 
-- GeoPoint(const CRational& lat, const CRational& lon)
-- : lat_(lat)
-- , lon_(lon)
-```cpp
-{
-}
-~GeoPoint() {}
-
-private:
-CRational lat_;
-CRational lon_;
-}
-;
+   private:
+    CRational lat_;
+    CRational lon_;
+};
 ```
 
 ## NonCopyable
@@ -553,12 +485,8 @@ class NonCopyable {
 
    protected:
     NonCopyable() = default;
-```
-
-- ~NonCopyable () = default; /// Protected non-virtual destructor
-```cpp
-}
-;
+    ~NonCopyable() = default;  /// Protected non-virtual destructor
+};
 
 class CantCopy : private NonCopyable {};
 ```
@@ -588,12 +516,9 @@ int main() {
 }
 
 int main() {
-    CRational r = 1;  // compile-time error
-```
-
-- PrintRational(2);// compile-time error
-```cpp
-return 0;
+    CRational r = 1;   // compile-time error
+    PrintRational(2);  // compile-time error
+    return 0;
 }
 ```
 
@@ -607,7 +532,7 @@ return 0;
 ## Rule of three
 
 
-- Если определен хотя бы один из трех методов, то надо определить все три
+- Если определён хотя бы один из трёх методов, обычно необходимо определить все три
 - Destructor
 - Copy constructor
 - Copy assignment operator
@@ -615,7 +540,7 @@ return 0;
 ## Rule of five
 
 
-- Если определен хотя бы один из трех методов, то надо определить все три
+- Если определён хотя бы один из пяти методов, обычно необходимо определить все пять
 - Destructor
 - Copy constructor
 - Copy assignment operator
@@ -628,24 +553,17 @@ return 0;
 ```cpp
 class CIntArray {
    public:
-```
+    CIntArray(size_t size) : size_(size), data_(new int[size]) {
+    }
 
-- CIntArray(size_t size)
-- : size_(size)
-- , data_ (new int[size])
-```cpp
-{
-}
+    ~CIntArray() {
+        delete[] data_;
+    }
 
-~CIntArray() {
-    delete[] data_;
-}
-
-private:
-int* data_;
-size_t size_;
-}
-;
+   private:
+    int* data_;
+    size_t size_;
+};
 ```
 
 ## Rule of three
@@ -697,20 +615,13 @@ int main() {
 ```cpp
 class CIntArray {
    public:
+    CIntArray(const CIntArray& other) : size_(other.size_), data_(new int[other.size_]) {
+        std::memcpy(other.data_, data_, sizeof(int) * size_);
+    }
+};
 ```
 
-- CIntArray(const CIntArray& other)
-- : size_(other.size_)
-- , data_(new int[other.size_])
-```cpp
-{
-    std::memcpy(other.data_, data_, sizeof(int) * size_);
-}
-}
-;
-```
-
-## new\delete
+## new/delete
 
 
 ```cpp
@@ -721,4 +632,4 @@ int main() {
 }
 ```
 
-## class\struct
+## class/struct
