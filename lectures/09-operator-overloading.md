@@ -6,6 +6,8 @@ title: "Лекция 9. Перегрузка операторов"
 
 [Открыть слайды](../slides/lectures/09-operator-overloading.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/09-operator-overloading.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

@@ -6,6 +6,8 @@ title: "Лекция 18. Лямбда-выражения"
 
 [Открыть слайды](../slides/lectures/18-lambda.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/18-lambda.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

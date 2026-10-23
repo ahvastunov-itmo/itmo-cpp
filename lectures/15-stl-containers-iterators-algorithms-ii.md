@@ -6,6 +6,8 @@ title: "Лекция 15. STL: контейнеры, итераторы и алг
 
 [Открыть слайды](../slides/lectures/15-stl-containers-iterators-algorithms-ii.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/15-stl-containers-iterators-algorithms-ii.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

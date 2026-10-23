@@ -6,6 +6,8 @@ title: "Лекция 11. Полиморфизм"
 
 [Открыть слайды](../slides/lectures/11-oop-polymorphism.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/11-oop-polymorphism.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

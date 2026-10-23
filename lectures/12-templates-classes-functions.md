@@ -6,6 +6,8 @@ title: "Лекция 12. Шаблоны классов и функций — I"
 
 [Открыть слайды](../slides/lectures/12-templates-classes-functions.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/12-templates-classes-functions.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

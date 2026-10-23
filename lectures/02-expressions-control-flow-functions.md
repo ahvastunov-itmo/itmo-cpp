@@ -6,6 +6,8 @@ title: "Лекция 2. Выражения, управление потоком 
 
 [Открыть слайды](../slides/lectures/02-expressions-control-flow-functions.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/02-expressions-control-flow-functions.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

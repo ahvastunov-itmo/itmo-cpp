@@ -6,6 +6,8 @@ title: "Лекция 20. Вариативные шаблоны"
 
 [Открыть слайды](../slides/lectures/20-variadic-templates.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/20-variadic-templates.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

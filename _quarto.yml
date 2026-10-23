@@ -10,6 +10,7 @@ project:
     - "lectures/*.md"
     - "articles/*.md"
     - "videos/*.md"
+    - "quizzes/*.md"
     - "!README.md"
     - "!AGENTS.md"
     - "!template.md"
@@ -40,13 +41,15 @@ website:
         text: Статьи
       - href: videos/index.md
         text: Видео
+      - href: quizzes/index.md
+        text: Квизы
       - href: schedule.md
         text: Расписание
     tools:
       - icon: github
         href: "https://github.com/ahvastunov-itmo/itmo-cpp"
         text: GitHub
-  # Лекции, статьи и видео живут в разных боковых панелях: стрелки
+  # Лекции, статьи, видео и квизы живут в разных боковых панелях: стрелки
   # «предыдущая / следующая» ходят только внутри своей панели.
   sidebar:
     - id: lectures
@@ -141,6 +144,61 @@ website:
           contents:
             - href: videos/index.md
               text: "Все видео"
+    - id: quizzes
+      title: "Квизы"
+      style: docked
+      search: true
+      contents:
+        - href: quizzes/index.md
+          text: "Все квизы"
+        - href: quizzes/00-introduction.md
+          text: "Вводная лекция"
+        - href: quizzes/01-types-operators.md
+          text: "1. Типы и операторы"
+        - href: quizzes/02-expressions-control-flow-functions.md
+          text: "2. Выражения, управление потоком и функции"
+        - href: quizzes/03-pointers-arrays.md
+          text: "3. Указатели, массивы и строки"
+        - href: quizzes/04-struct-union.md
+          text: "4. Структуры и объединения"
+        - href: quizzes/05-memory.md
+          text: "5. Работа с памятью"
+        - href: quizzes/06-references-initialization-functions-namespaces.md
+          text: "6. Ссылки, инициализация, функции и пространства имён"
+        - href: quizzes/07-compiler-preprocessor.md
+          text: "7. Компилятор и препроцессор"
+        - href: quizzes/08-oop-abstraction-encapsulation.md
+          text: "8. Абстракция и инкапсуляция"
+        - href: quizzes/09-operator-overloading.md
+          text: "9. Перегрузка операторов"
+        - href: quizzes/10-oop-inheritance-polymorphism.md
+          text: "10. Наследование и полиморфизм"
+        - href: quizzes/11-oop-polymorphism.md
+          text: "11. Полиморфизм"
+        - href: quizzes/12-templates-classes-functions.md
+          text: "12. Шаблоны классов и функций — I"
+        - href: quizzes/13-templates-ii.md
+          text: "13. Шаблоны — II"
+        - href: quizzes/smart-pointers.md
+          text: "Умные указатели"
+        - href: quizzes/14-stl-containers-iterators-algorithms.md
+          text: "14. STL: контейнеры, итераторы и алгоритмы"
+        - href: quizzes/15-stl-containers-iterators-algorithms-ii.md
+          text: "15. STL: контейнеры, итераторы и алгоритмы — II"
+        - href: quizzes/16-error-handling.md
+          text: "16. Обработка ошибок"
+        - href: quizzes/17-casts-crtp.md
+          text: "17. Приведения типов и CRTP"
+        - href: quizzes/18-lambda.md
+          text: "18. Лямбда-выражения"
+        - href: quizzes/19-value-categories-move-semantics.md
+          text: "19. Категории значений и семантика перемещения"
+        - href: quizzes/20-variadic-templates.md
+          text: "20. Вариативные шаблоны"
+        - href: quizzes/21-template-metaprogramming.md
+          text: "21. Шаблонное метапрограммирование"
+        - href: quizzes/22-concurrency.md
+          text: "22. Многопоточность"
   page-footer:
     left: "Материалы курса по C и C++"
     right: "Сайт собран с помощью [Quarto](https://quarto.org/)"

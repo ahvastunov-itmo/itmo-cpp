@@ -6,6 +6,8 @@ title: "Лекция 13. Шаблоны — II"
 
 [Открыть слайды](../slides/lectures/13-templates-ii.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/13-templates-ii.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

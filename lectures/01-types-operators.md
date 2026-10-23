@@ -6,6 +6,8 @@ title: "Лекция 1. Типы и операторы"
 
 [Открыть слайды](../slides/lectures/01-types-operators.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/01-types-operators.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции
