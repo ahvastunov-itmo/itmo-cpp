@@ -16,6 +16,15 @@
 - When an article is ported from an external source, keep the original wording and the author's voice, and fix only outright typos. The front matter `author` list is the credit; do not repeat the authors in the body.
 - Write article headings with `##` and `###`. `toc-depth` is 3, so a deeper heading disappears from the table of contents.
 
+## Quizzes
+
+- Quizzes live in `quizzes/` and render only as website pages. Keep them in their own `quizzes` sidebar and exclude them from the slides profile.
+- Register each quiz in `_quarto.yml`, in the `quizzes/index.md` catalog, on `index.md`, and in the corresponding lecture's website-only block.
+- Keep questions, answer options and explanations in the quiz Markdown. Use `.quiz-question` with a `data-answer` attribute containing the one-based indices of all correct choices, an `h2` heading, a `.quiz-options` ordered list and a `details.quiz-explanation` block.
+- Reuse external lecture examples via `include`; do not copy them into the quiz. Use C++20 and explicitly identify examples with undefined behavior as analysis-only.
+- Keep a readable fallback with native `details` when JavaScript is unavailable. Do not hide questions in the base HTML or CSS.
+- After changing quiz behavior, run `npm ci` if dependencies are missing, then `npm test`. Render the website when changing navigation and check links to lecture sections. Node.js 26 or a supported recent LTS version is needed for the DOM tests; npm is not required to build the website.
+
 ## Schedule page
 
 - `schedule.md` stores the timetable as plain Markdown tables and is the only place to edit it. Each `##` heading is a week, each `###` heading is a day, and every table row is `Время | Тип. Преподаватель. Группа`, for example `13:30-15:00 | Практика. Курилов. М3112`. Keep this shape: `assets/schedule/schedule.js` reads the rendered tables from the page, draws the two-week calendar with the type and teacher filters into the empty `::: {#schedule .column-page}` div, and hides the tables. Without JavaScript the tables stay visible.

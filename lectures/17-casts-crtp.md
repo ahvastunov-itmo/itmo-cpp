@@ -6,6 +6,8 @@ title: "Лекция 17. Приведения типов и CRTP"
 
 [Открыть слайды](../slides/lectures/17-casts-crtp.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/17-casts-crtp.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

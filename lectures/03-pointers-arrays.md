@@ -6,6 +6,8 @@ title: "Лекция 3. Указатели, массивы и строки"
 
 [Открыть слайды](../slides/lectures/03-pointers-arrays.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/03-pointers-arrays.md){.btn .btn-outline-primary}
+
 :::
 
 ## 1. Указатели и адреса памяти

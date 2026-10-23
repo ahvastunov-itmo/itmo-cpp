@@ -6,6 +6,8 @@ title: "Лекция 8. Абстракция и инкапсуляция"
 
 [Открыть слайды](../slides/lectures/08-oop-abstraction-encapsulation.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/08-oop-abstraction-encapsulation.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

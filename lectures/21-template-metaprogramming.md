@@ -6,6 +6,8 @@ title: "Лекция 21. Шаблонное метапрограммирован
 
 [Открыть слайды](../slides/lectures/21-template-metaprogramming.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/21-template-metaprogramming.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

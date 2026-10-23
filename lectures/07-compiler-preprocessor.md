@@ -6,6 +6,8 @@ title: "Лекция 7. Компилятор и препроцессор"
 
 [Открыть слайды](../slides/lectures/07-compiler-preprocessor.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/07-compiler-preprocessor.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

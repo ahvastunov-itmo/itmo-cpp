@@ -6,6 +6,8 @@ title: "Лекция 16. Обработка ошибок"
 
 [Открыть слайды](../slides/lectures/16-error-handling.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/16-error-handling.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

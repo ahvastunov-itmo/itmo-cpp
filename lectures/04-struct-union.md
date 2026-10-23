@@ -6,6 +6,8 @@ title: "Лекция 4. Структуры и объединения"
 
 [Открыть слайды](../slides/lectures/04-struct-union.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/04-struct-union.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

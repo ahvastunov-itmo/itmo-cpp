@@ -6,6 +6,8 @@ title: "Умные указатели"
 
 [Открыть слайды](../slides/lectures/smart-pointers.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/smart-pointers.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

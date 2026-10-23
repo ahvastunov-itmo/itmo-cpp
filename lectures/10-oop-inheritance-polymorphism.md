@@ -6,6 +6,8 @@ title: "Лекция 10. Наследование и полиморфизм"
 
 [Открыть слайды](../slides/lectures/10-oop-inheritance-polymorphism.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/10-oop-inheritance-polymorphism.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

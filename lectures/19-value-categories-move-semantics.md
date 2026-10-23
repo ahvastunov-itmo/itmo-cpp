@@ -6,6 +6,8 @@ title: "Лекция 19. Категории значений и семантик
 
 [Открыть слайды](../slides/lectures/19-value-categories-move-semantics.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/19-value-categories-move-semantics.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

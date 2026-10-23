@@ -6,6 +6,8 @@ title: "Лекция 6. Ссылки, инициализация, функции
 
 [Открыть слайды](../slides/lectures/06-references-initialization-functions-namespaces.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/06-references-initialization-functions-namespaces.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

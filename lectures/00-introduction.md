@@ -6,6 +6,8 @@ title: "Вводная лекция. Язык C и C++"
 
 [Открыть слайды](../slides/lectures/00-introduction.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/00-introduction.md){.btn .btn-outline-primary}
+
 :::
 
 ## Основы программирования.

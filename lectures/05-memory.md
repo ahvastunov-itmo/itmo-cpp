@@ -6,6 +6,8 @@ title: "Лекция 5. Работа с памятью"
 
 [Открыть слайды](../slides/lectures/05-memory.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/05-memory.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции

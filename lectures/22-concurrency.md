@@ -6,6 +6,8 @@ title: "Лекция 22. Многопоточность"
 
 [Открыть слайды](../slides/lectures/22-concurrency.html){.btn .btn-outline-primary target="_blank"}
 
+[Проверить себя: 10 вопросов](../quizzes/22-concurrency.md){.btn .btn-outline-primary}
+
 :::
 
 ## План лекции
