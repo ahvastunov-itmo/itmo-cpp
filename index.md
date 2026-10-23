@@ -1,45 +1,50 @@
 ---
 title: Основы программирования на C++
 description: Конспекты курса по языкам C и C++
-toc: false
+toc: true
+page-navigation: true
+sidebar: false
 ---
 
-Материалы курса по языкам C и C++: от базовых типов, указателей и устройства памяти до шаблонного метапрограммирования и многопоточности.
+Материалы курса доступны в двух форматах: как связный конспект и как презентация.
 
-Каждая лекция доступна в двух форматах: как связный конспект и как презентация Reveal.js. Ссылка **«Открыть слайды»** находится в начале страницы каждой лекции.
+## Лекции
 
+1. [Вводная лекция](lectures/00-introduction.md)
+2. [Типы и операторы](lectures/01-types-operators.md)
+3. [Выражения, управление потоком и функции](lectures/02-expressions-control-flow-functions.md)
+4. [Указатели, массивы и строки](lectures/03-pointers-arrays.md)
+5. [Структуры и объединения](lectures/04-struct-union.md)
+6. [Работа с памятью](lectures/05-memory.md)
+7. [Ссылки, инициализация, функции и пространства имён](lectures/06-references-initialization-functions-namespaces.md)
+8. [Компилятор и препроцессор](lectures/07-compiler-preprocessor.md)
+9. [Абстракция и инкапсуляция](lectures/08-oop-abstraction-encapsulation.md)
+10. [Перегрузка операторов](lectures/09-operator-overloading.md)
+11. [Наследование и полиморфизм](lectures/10-oop-inheritance-polymorphism.md)
+12. [Полиморфизм](lectures/11-oop-polymorphism.md)
+13. [Шаблоны классов и функций — I](lectures/12-templates-classes-functions.md)
+14. [Шаблоны — II](lectures/13-templates-ii.md)
+15. [Умные указатели](lectures/smart-pointers.md)
+16. [STL: контейнеры, итераторы и алгоритмы](lectures/14-stl-containers-iterators-algorithms.md)
+17. [STL: контейнеры, итераторы и алгоритмы — II](lectures/15-stl-containers-iterators-algorithms-ii.md)
+18. [Обработка ошибок](lectures/16-error-handling.md)
+19. [Приведения типов и CRTP](lectures/17-casts-crtp.md)
+20. [Лямбда-выражения](lectures/18-lambda.md)
+21. [Категории значений и семантика перемещения](lectures/19-value-categories-move-semantics.md)
+22. [Вариативные шаблоны](lectures/20-variadic-templates.md)
+23. [Шаблонное метапрограммирование](lectures/21-template-metaprogramming.md)
+24. [Многопоточность](lectures/22-concurrency.md)
 
-## Начало курса
+## Статьи
 
-1. [Вводная лекция: язык C и C++](00-introduction.md)
-2. [Лекция 1. Типы, операторы и функции](01-types-operators-functions.md)
-3. [Лекция 2. Указатели, массивы и строки](02-pointers-arrays.md) — текстовый конспект
-4. [Лекция 3. Структуры и объединения](03-struct-union.md) — текстовый конспект
-5. [Лекция 4. Работа с памятью](04-memory.md)
-6. [Лекция 5. Ссылки, инициализация, функции и пространства имён](05-references-initialization-functions-namespaces.md)
-7. [Лекция 6. Компилятор и препроцессор](06-compiler-preprocessor.md)
+Короткие практические заметки: настройка окружения, инструменты, рецепты. В отличие от лекций, статьи не собираются в слайды.
 
-## Объектно-ориентированное программирование
+1. [Установка окружения](articles/01-setup.md) — инструменты курса и установка VS Code, а дальше гайды по системам: [macOS](articles/01-setup-macos.md), [Windows](articles/01-setup-windows.md), [Linux](articles/01-setup-linux.md)
 
-1. [Лекция 7. Абстракция и инкапсуляция](07-oop-abstraction-encapsulation.md)
-2. [Лекция 8. Перегрузка операторов](08-operator-overloading.md)
-3. [Лекция 9. Наследование и полиморфизм](09-oop-inheritance-polymorphism.md)
-4. [Лекция 10. Полиморфизм](10-oop-polymorphism.md)
+## Видео
 
-## Шаблоны и стандартная библиотека
+[Видеоматериалы курса](videos/index.md)
 
-1. [Лекция 11. Шаблоны классов и функций — I](11-templates-classes-functions.md)
-2. [Лекция 12. Шаблоны — II](12-templates-ii.md)
-3. [Умные указатели](smart-pointers.md)
-4. [Лекция 13. STL: контейнеры, итераторы и алгоритмы](13-stl-containers-iterators-algorithms.md)
-5. [Лекция 14. STL: контейнеры, итераторы и алгоритмы — II](14-stl-containers-iterators-algorithms-ii.md)
+## Расписание
 
-## Продвинутые возможности C++
-
-1. [Лекция 15. Обработка ошибок](15-error-handling.md)
-2. [Лекция 16. Приведения типов и CRTP](16-casts-crtp.md)
-3. [Лекция 17. Лямбда-выражения](17-lambda.md)
-4. [Лекция 18. Категории значений и семантика перемещения](18-value-categories-move-semantics.md)
-5. [Лекция 19. Вариативные шаблоны](19-variadic-templates.md)
-6. [Лекция 20. Шаблонное метапрограммирование](20-template-metaprogramming.md)
-7. [Лекция 21. Многопоточность](21-concurrency.md)
+[Расписание занятий](schedule.md) — даты, время и темы встреч.
