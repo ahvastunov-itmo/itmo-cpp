@@ -50,6 +50,21 @@ pre.sourceCode {
   border-left: 0.25rem solid var(--course-accent);
 }
 
+/* Keep lecture columns separated while respecting their relative widths. */
+main .columns {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-block: 1rem;
+}
+
+main .columns > .column {
+  flex: 0 1 auto;
+  min-width: 0;
+.quarto-dark :is(h1, h2, h3, h4, h5, h6, figcaption, dt, dd, caption) code:not(.sourceCode) {
+  background-color: rgba(67, 67, 67, 0.65);
+}
+
 main img {
   display: block;
   max-height: 44rem;
@@ -57,11 +72,35 @@ main img {
   object-fit: contain;
 }
 
+main img.godbolt-link-image {
+  width: 32px;
+  max-height: none;
+  margin: 0.25rem 0 0.75rem;
+}
+
+main p:has(> a > img.godbolt-link-image) {
+  text-align: left;
+}
+
+.quarto-title-meta-heading,
+.quarto-title-meta-contents {
+  font-size: 0.9rem;
+}
+
 .page-navigation {
   margin-top: 3rem;
 }
 
 @media (max-width: 767.98px) {
+  main .columns {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  main .columns > .column {
+    width: 100% !important;
+  }
+
   body {
     line-height: 1.55;
   }
@@ -69,4 +108,51 @@ main img {
   main img {
     margin-block: 1rem;
   }
+}
+
+/* Quick Bench: chart/play icon and a distinct teal action button. */
+main a.quick-bench-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 14px;
+  border: 1px solid #0f766e;
+  border-radius: 9px;
+  background: #0f766e;
+  color: #fff;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: none;
+  vertical-align: middle;
+  box-shadow: 0 2px 5px rgb(15 118 110 / 18%);
+  transition: background-color 120ms ease, box-shadow 120ms ease;
+}
+
+main a.quick-bench-button:hover {
+  color: #fff;
+  background: #115e59;
+  border-color: #115e59;
+  box-shadow: 0 3px 8px rgb(15 118 110 / 25%);
+}
+
+main a.quick-bench-button:focus-visible {
+  outline: 3px solid #2dd4bf;
+  outline-offset: 3px;
+}
+
+main a.quick-bench-button img {
+  display: inline-block;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  max-height: none;
+  margin: 0;
+}
+
+main p:has(> a.quick-bench-button) {
+  margin-top: 0.25em;
+  margin-bottom: 0.5em;
+  text-align: left;
 }

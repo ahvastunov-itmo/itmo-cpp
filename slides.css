@@ -28,12 +28,37 @@
   font-size: 2em;
 }
 
+
 .reveal .slides section > h2:first-child {
   margin-bottom: 0.5em;
   padding-bottom: 0.16em;
   border-bottom: 3px solid currentColor;
   font-size: 1.55em;
   line-height: 1.08;
+}
+
+.reveal .slides section > h2:empty {
+  display: none;
+}
+
+/* Two spans (masked placeholder + real title) stacked in the same cell so
+   the fade-out/fade-in fragment pair crossfades in place of the heading. */
+.reveal .slides section.mystery-heading > h2 {
+  display: grid;
+}
+
+.reveal .slides section.mystery-heading > h2 > span {
+  grid-area: 1 / 1;
+}
+
+/* Two blocks (e.g. bad/good code) stacked in the same cell so the
+   fade-out/fade-in fragment pair crossfades one into the other in place. */
+.reveal .code-swap {
+  display: grid;
+}
+
+.reveal .code-swap > div {
+  grid-area: 1 / 1;
 }
 
 .reveal img {
@@ -43,6 +68,11 @@
 
 .reveal blockquote {
   padding: 0.6em 0.9em;
+}
+
+.reveal .slides table {
+  margin-left: 0 !important;
+  margin-right: auto !important;
 }
 
 /* Compact link placed directly below runnable code examples. */
@@ -76,4 +106,51 @@
   font-size: 20px;
   font-weight: 600;
   opacity: 0.8;
+}
+
+/* Quick Bench: chart/play icon and a distinct teal action button. */
+.reveal a.quick-bench-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 14px;
+  border: 1px solid #0f766e;
+  border-radius: 9px;
+  background: #0f766e;
+  color: #fff;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: none;
+  vertical-align: middle;
+  box-shadow: 0 2px 5px rgb(15 118 110 / 18%);
+  transition: background-color 120ms ease, box-shadow 120ms ease;
+}
+
+.reveal a.quick-bench-button:hover {
+  color: #fff;
+  background: #115e59;
+  border-color: #115e59;
+  box-shadow: 0 3px 8px rgb(15 118 110 / 25%);
+}
+
+.reveal a.quick-bench-button:focus-visible {
+  outline: 3px solid #2dd4bf;
+  outline-offset: 3px;
+}
+
+.reveal a.quick-bench-button img {
+  display: inline-block;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  max-height: none;
+  margin: 0;
+}
+
+.reveal p:has(> a.quick-bench-button) {
+  margin-top: 0.25em;
+  margin-bottom: 0.5em;
+  text-align: left;
 }

@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 
 import {readdir, readFile, writeFile} from 'node:fs/promises';
-import {resolve} from 'node:path';
+import {dirname, join, resolve} from 'node:path';
 
 const requestedFiles = process.argv.slice(2);
 const markdownFiles = requestedFiles.length > 0
     ? requestedFiles
-    : (await readdir('.')).filter(file => file.endsWith('.md'));
+    : (await readdir('lectures'))
+        .filter(file => file.endsWith('.md'))
+        .map(file => join('lectures', file));
 
 const minifiedKeys = [
     'settings',
@@ -101,7 +103,7 @@ function quoteRison(value) {
         .replaceAll('%20', '+');
 }
 
-function makeGodboltUrl(source, compiler, options) {
+function makeGodboltUrl(source, compiler, options, mode = 'executor') {
     const content = [
         {
             type: 'row',
@@ -118,7 +120,7 @@ function makeGodboltUrl(source, compiler, options) {
                 },
                 {
                     type: 'component',
-                    componentName: 'executor',
+                    componentName: mode,
                     componentState: {
                         source: 1,
                         tree: 0,
@@ -126,8 +128,9 @@ function makeGodboltUrl(source, compiler, options) {
                         libs: [],
                         options,
                         lang: 'c++',
-                        compilationPanelShown: true,
-                        compilerOutShown: true,
+                        ...(mode === 'compiler'
+                            ? {id: 1, filters: {binary: false, binaryObject: false, execute: false}}
+                            : {compilationPanelShown: true, compilerOutShown: true}),
                     },
                 },
             ],
@@ -140,7 +143,19 @@ function makeGodboltUrl(source, compiler, options) {
     return `https://godbolt.org/#${hash}`;
 }
 
-const definitionPattern = /^(\[godbolt-[^\]]+\]:)\s+<[^>]*>[ \t]*(?:\r?\n)?<!--\s+godbolt\s+source="([^"]+)"\s+compiler="([^"]+)"\s+options="([^"]*)"\s+-->$/gm;
+// Inline local headers so shared slide definitions remain runnable on Godbolt.
+async function readExample(sourcePath, stack = new Set()) {
+    if (stack.has(sourcePath)) throw new Error(`Circular include: ${sourcePath}`);
+    const nextStack = new Set(stack).add(sourcePath);
+    const source = await readFile(sourcePath, 'utf8');
+    return replaceAsync(source, /^#include "([^"\n]+)"[ \t]*$/gm, async (_, header) => {
+        const included = await readExample(resolve(dirname(sourcePath), header), nextStack);
+        return included.replace(/^#pragma once[ \t]*\r?\n/gm, '').trimEnd();
+    });
+}
+
+// Use mode="compiler" for declarations and examples meant to be inspected without running.
+const definitionPattern = /^(\[godbolt-[^\]]+\]:)\s+<[^>]*>[ \t]*(?:\r?\n)?<!--\s+godbolt\s+source="([^"]+)"\s+compiler="([^"]+)"\s+options="([^"]*)"(?:\s+mode="(compiler|executor)")?\s+-->$/gm;
 
 for (const markdownFile of markdownFiles) {
     const markdownPath = resolve(markdownFile);
@@ -148,12 +163,13 @@ for (const markdownFile of markdownFiles) {
     const definitions = [];
     let replacements = 0;
 
-    const linksUpdated = await replaceAsync(markdown, definitionPattern, async (match, label, sourcePath, compiler, options) => {
-        const source = await readFile(resolve(sourcePath), 'utf8');
-        const url = makeGodboltUrl(source, compiler, options);
+    const linksUpdated = await replaceAsync(markdown, definitionPattern, async (match, label, sourcePath, compiler, options, mode) => {
+        const source = await readExample(resolve(dirname(markdownPath), sourcePath));
+        const url = makeGodboltUrl(source, compiler, options, mode);
         definitions.push({reference: label.slice(1, -2), sourcePath});
         replacements += 1;
-        return `${label} <${url}>\n<!-- godbolt source="${sourcePath}" compiler="${compiler}" options="${options}" -->`;
+        const modeAttribute = mode === undefined ? '' : ` mode="${mode}"`;
+        return `${label} <${url}>\n<!-- godbolt source="${sourcePath}" compiler="${compiler}" options="${options}"${modeAttribute} -->`;
     });
 
     if (replacements === 0) continue;
@@ -169,7 +185,7 @@ for (const markdownFile of markdownFiles) {
 }
 
 function placeGodboltButtonsAfterCode(markdown, definitions, markdownFile) {
-    const buttonPattern = /^\[!\[\]\(assets\/compiler-explorer\.svg\)\{\.godbolt-link-image width="32"\}\]\[(godbolt-[^\]]+)\]\{aria-label="Open in Compiler Explorer"\}[ \t]*$/gm;
+    const buttonPattern = /^\[!\[\]\(\.\.\/assets\/compiler-explorer\.svg\)\{\.godbolt-link-image width="32"\}\]\[(godbolt-[^\]]+)\]\{aria-label="Open in Compiler Explorer"\}[ \t]*$/gm;
     const buttons = new Map();
 
     let result = markdown.replace(buttonPattern, (button, reference) => {

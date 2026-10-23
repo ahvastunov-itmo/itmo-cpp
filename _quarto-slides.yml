@@ -2,8 +2,13 @@ project:
   type: default
   output-dir: _site/slides
   render:
-    - "*.md"
+    - "lectures/*.md"
     - "!index.md"
+    - "!schedule.md"
+    - "!articles/*.md"
+    - "!videos/*.md"
+    - "!README.md"
+    - "!AGENTS.md"
     - "!template.md"
 
 format:
